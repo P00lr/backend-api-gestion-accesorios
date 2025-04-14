@@ -1,48 +1,45 @@
 package com.universidad.tecno.api_gestion_accesorios.entities;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "roles_permissions")
+@Table(name = "roles_permissions", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"role_id", "permission_id"})
+})
 public class RolePermission {
 
-    @EmbeddedId
-    private RolePermissionId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
-    @MapsId("roleId")
-    @JsonIgnoreProperties({"rolePermissions", "handler", "hibernateLazyInitializer"})
+    @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
     @ManyToOne
-    @MapsId("permissionId")
-    @JsonIgnoreProperties({"rolePermissions", "handler", "hibernateLazyInitializer"})
+    @JoinColumn(name = "permission_id", nullable = false)
     private Permission permission;
 
-    
     public RolePermission() {
     }
 
     public RolePermission(Role role, Permission permission) {
         this.role = role;
         this.permission = permission;
-        //para poder trabajar tranquilamente con el id compuesto
-        this.id = new RolePermissionId(role.getId(), permission.getId());
     }
-    
 
-    public RolePermissionId getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(RolePermissionId id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -61,50 +58,6 @@ public class RolePermission {
     public void setPermission(Permission permission) {
         this.permission = permission;
     }
-    
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((role == null) ? 0 : role.hashCode());
-        result = prime * result + ((permission == null) ? 0 : permission.hashCode());
-        return result;
-    }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        RolePermission other = (RolePermission) obj;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        if (role == null) {
-            if (other.role != null)
-                return false;
-        } else if (!role.equals(other.role))
-            return false;
-        if (permission == null) {
-            if (other.permission != null)
-                return false;
-        } else if (!permission.equals(other.permission))
-            return false;
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "RolePermission [id=" + id + ", role=" + role + ", permission=" + permission + "]";
-    }
-
-    
-
-    
 }
+

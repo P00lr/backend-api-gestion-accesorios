@@ -5,9 +5,9 @@ import java.util.List;
 public class RoleWithPermissionsDto {
     private Long id;
     private String name;
-    private List<PermissionDto> permissions;
+    private List<String> permissions;  // Cambié la lista a String para mostrar solo los nombres
 
-    public RoleWithPermissionsDto(Long id, String name, List<PermissionDto> permissions) {
+    public RoleWithPermissionsDto(Long id, String name, List<String> permissions) {
         this.id = id;
         this.name = name;
         this.permissions = permissions;
@@ -29,11 +29,11 @@ public class RoleWithPermissionsDto {
         this.name = name;
     }
 
-    public List<PermissionDto> getPermissions() {
+    public List<String> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(List<PermissionDto> permissions) {
+    public void setPermissions(List<String> permissions) {
         this.permissions = permissions;
     }
     

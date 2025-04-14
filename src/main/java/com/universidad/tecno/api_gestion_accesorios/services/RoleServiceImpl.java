@@ -13,7 +13,6 @@ import com.universidad.tecno.api_gestion_accesorios.dto.RoleWithPermissionsDto;
 import com.universidad.tecno.api_gestion_accesorios.entities.Permission;
 import com.universidad.tecno.api_gestion_accesorios.entities.Role;
 import com.universidad.tecno.api_gestion_accesorios.entities.RolePermission;
-import com.universidad.tecno.api_gestion_accesorios.entities.RolePermissionId;
 import com.universidad.tecno.api_gestion_accesorios.repositories.PermissionRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.RolePermissionRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.RoleRepository;
@@ -41,11 +40,8 @@ public class RoleServiceImpl implements RoleService {
         List<Role> roles = (List<Role>) roleRepository.findAll();
 
         return roles.stream().map(role -> {
-            List<PermissionDto> permisos = role.getRolePermissions().stream()
-                    .map(rp -> {
-                        Permission p = rp.getPermission();
-                        return new PermissionDto(p.getId(), p.getName());
-                    })
+            List<String> permisos = role.getRolePermissions().stream()
+                    .map(rp -> rp.getPermission().getName()) // Extraemos el nombre del permiso
                     .collect(Collectors.toList());
 
             return new RoleWithPermissionsDto(role.getId(), role.getName(), permisos);
@@ -87,22 +83,21 @@ public class RoleServiceImpl implements RoleService {
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new EntityNotFoundException("Rol no encontrado"));
 
-        // Convertir el iterable a lista para trabajar con él
+        // convierte en una lista de permisos
         List<Permission> permissions = StreamSupport
                 .stream(permissionRepository.findAllById(permissionIds).spliterator(), false)
                 .collect(Collectors.toList());
 
         for (Permission permission : permissions) {
-            // Crear ID compuesto
-            RolePermissionId rolePermissionId = new RolePermissionId(role.getId(), permission.getId());
+            // Verificar si ya existe para no duplicar
+            boolean alreadyExists = rolePermissionRepository.existsByRoleAndPermission(role, permission);
+            if (alreadyExists)
+                continue;
 
-            // Crear la entidad
             RolePermission rolePermission = new RolePermission();
-            rolePermission.setId(rolePermissionId);
             rolePermission.setRole(role);
             rolePermission.setPermission(permission);
 
-            // Guardar
             rolePermissionRepository.save(rolePermission);
         }
     }

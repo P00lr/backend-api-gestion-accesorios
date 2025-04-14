@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.universidad.tecno.api_gestion_accesorios.dto.RolePermissionAssignmentDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.RoleWithPermissionsDto;
 import com.universidad.tecno.api_gestion_accesorios.entities.Role;
 import com.universidad.tecno.api_gestion_accesorios.services.RoleService;
@@ -48,12 +49,15 @@ public class RolController {
         Role createdRole = roleService.save(role);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRole);
     }
-    @PostMapping("/{roleId}/permissions")
-    public ResponseEntity<Void> assignPermissionsToRole(
-            @PathVariable Long roleId,
-            @RequestBody List<Long> permissionIds) {
 
-        roleService.assignPermissionsToRole(roleId, permissionIds);
+    @PostMapping("/assign-permissions")
+    public ResponseEntity<Void> assignPermissionsToRole(
+            @RequestBody RolePermissionAssignmentDto assignmentDto) {
+
+        roleService.assignPermissionsToRole(
+                assignmentDto.getRoleId(),
+                assignmentDto.getPermissionIds());
+
         return ResponseEntity.ok().build();
     }
 
@@ -73,7 +77,5 @@ public class RolController {
             return ResponseEntity.notFound().build();
         }
     }
-    
-
 
 }

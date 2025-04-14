@@ -27,6 +27,22 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
     private List<UserRolePermission> userRolePermissions;
 
+    
+    public User() {
+        this.enabled = true;
+    }
+    
+    public User(Long id, String name, String username, String password, String email, boolean enabled,
+            List<UserRolePermission> userRolePermissions) {
+        this.id = id;
+        this.name = name;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.enabled = enabled;
+        this.userRolePermissions = userRolePermissions;
+    }
+
     public Long getId() {
         return id;
     }
