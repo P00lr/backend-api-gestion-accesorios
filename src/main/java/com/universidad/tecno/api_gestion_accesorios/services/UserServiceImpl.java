@@ -1,7 +1,5 @@
 package com.universidad.tecno.api_gestion_accesorios.services;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,8 +9,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.universidad.tecno.api_gestion_accesorios.dto.UserRolePermissionsResponseDto;
-import com.universidad.tecno.api_gestion_accesorios.dto.UserWithPermissionsDto;
+import com.universidad.tecno.api_gestion_accesorios.dto.role.RolePermissionsDto;
+import com.universidad.tecno.api_gestion_accesorios.dto.user.UserWithRolesAndPermissionsDto;
 import com.universidad.tecno.api_gestion_accesorios.entities.RolePermission;
 import com.universidad.tecno.api_gestion_accesorios.entities.User;
 import com.universidad.tecno.api_gestion_accesorios.entities.UserRolePermission;
@@ -40,22 +38,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserWithPermissionsDto> getAllUsersWithPermissions() {
+    public List<UserWithRolesAndPermissionsDto> getUsersWithRolesAndPermissions() {
         List<User> users = (List<User>) userRepository.findAll();
 
         return users.stream().map(user -> {
-            List<String> permissions = user.getUserRolePermissions()
-                    .stream()
-                    .map(urp -> urp.getRolePermission().getPermission().getName())
-                    .distinct()
-                    .toList();
+            Map<String, List<String>> rolePermissionsMap = user.getUserRolePermissions().stream()
+                    .collect(Collectors.groupingBy(
+                            urp -> urp.getRolePermission().getRole().getName(),
+                            Collectors.mapping(
+                                    urp -> urp.getRolePermission().getPermission().getName(),
+                                    Collectors.toList())));
 
-            return new UserWithPermissionsDto(
-                    user.getId(),
-                    user.getName(),
-                    user.getUsername(),
-                    permissions);
-        }).toList();
+            // Convertir a DTOs
+            List<RolePermissionsDto> roles = rolePermissionsMap.entrySet().stream()
+                    .map(entry -> new RolePermissionsDto(entry.getKey(), entry.getValue()))
+                    .collect(Collectors.toList());
+
+            return new UserWithRolesAndPermissionsDto(user.getId(), user.getUsername(), roles);
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -125,29 +125,4 @@ public class UserServiceImpl implements UserService {
             userRolePermissionRepository.saveAll(nuevos);
         }
     }
-
-    @Override
-    public List<UserRolePermissionsResponseDto> getAllUserRolePermissions() {
-        List<UserRolePermission> userRolePermissions = (List<UserRolePermission>) userRolePermissionRepository.findAll();
-
-        Map<String, UserRolePermissionsResponseDto> responseMap = new LinkedHashMap<>();
-
-        for (UserRolePermission urp : userRolePermissions) {
-            Long userId = urp.getUser().getId();
-            String userName = urp.getUser().getUsername();
-            String roleName = urp.getRolePermission().getRole().getName();
-            String permissionName = urp.getRolePermission().getPermission().getName();
-
-            String key = userId + "_" + roleName;
-
-            if (!responseMap.containsKey(key)) {
-                responseMap.put(key, new UserRolePermissionsResponseDto(userId, userName, roleName, new ArrayList<>()));
-            }
-
-            responseMap.get(key).getPermissions().add(permissionName);
-        }
-
-        return new ArrayList<>(responseMap.values());
-    }
-
 }

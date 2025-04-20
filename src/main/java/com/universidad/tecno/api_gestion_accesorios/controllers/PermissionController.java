@@ -14,10 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.universidad.tecno.api_gestion_accesorios.dto.RolePermissionAssignmentDto;
+import com.universidad.tecno.api_gestion_accesorios.dto.role.RolePermissionAssignmentDto;
 import com.universidad.tecno.api_gestion_accesorios.entities.Permission;
 import com.universidad.tecno.api_gestion_accesorios.services.PermissionService;
-import com.universidad.tecno.api_gestion_accesorios.services.RoleService;
 
 @RestController
 @RequestMapping("/api/permissions")
@@ -26,8 +25,6 @@ public class PermissionController {
     @Autowired
     private PermissionService permissionService;
 
-    @Autowired
-    private RoleService roleService;
 
     @GetMapping
     public List<Permission> getPermissions() {
@@ -52,7 +49,7 @@ public class PermissionController {
     public ResponseEntity<Void> assignPermissionsToRole(
             @RequestBody RolePermissionAssignmentDto dto) {
 
-        roleService.assignPermissionsToRole(dto.getRoleId(), dto.getPermissionIds());
+        permissionService.assignPermissionsToRole(dto.getRoleId(), dto.getPermissionIds());
         return ResponseEntity.ok().build();
     }
 

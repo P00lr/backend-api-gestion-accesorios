@@ -1,20 +1,20 @@
 package com.universidad.tecno.api_gestion_accesorios.services;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.universidad.tecno.api_gestion_accesorios.dto.RoleWithPermissionsDto;
-import com.universidad.tecno.api_gestion_accesorios.entities.Permission;
+import com.universidad.tecno.api_gestion_accesorios.dto.role.RolePermissionsDto;
+import com.universidad.tecno.api_gestion_accesorios.dto.role.RoleWithPermissionsDto;
+import com.universidad.tecno.api_gestion_accesorios.dto.user.UserWithRolesAndPermissionsDto;
 import com.universidad.tecno.api_gestion_accesorios.entities.Role;
 import com.universidad.tecno.api_gestion_accesorios.entities.RolePermission;
 import com.universidad.tecno.api_gestion_accesorios.entities.User;
 import com.universidad.tecno.api_gestion_accesorios.entities.UserRolePermission;
-import com.universidad.tecno.api_gestion_accesorios.repositories.PermissionRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.RolePermissionRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.RoleRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.UserRepository;
@@ -28,9 +28,6 @@ public class RoleServiceImpl implements RoleService {
 
     @Autowired
     private RoleRepository roleRepository;
-
-    @Autowired
-    private PermissionRepository permissionRepository;
 
     @Autowired
     private RolePermissionRepository rolePermissionRepository;
@@ -55,6 +52,28 @@ public class RoleServiceImpl implements RoleService {
                     .collect(Collectors.toList());
 
             return new RoleWithPermissionsDto(role.getId(), role.getName(), permisos);
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserWithRolesAndPermissionsDto> getUsersWithRolesAndPermissions() {
+        List<User> users = (List<User>) userRepository.findAll();
+
+        return users.stream().map(user -> {
+            // Agrupar por role
+            Map<String, List<String>> rolePermissionsMap = user.getUserRolePermissions().stream()
+                    .collect(Collectors.groupingBy(
+                            urp -> urp.getRolePermission().getRole().getName(),
+                            Collectors.mapping(
+                                    urp -> urp.getRolePermission().getPermission().getName(),
+                                    Collectors.toList())));
+
+            // Convertir a DTOs
+            List<RolePermissionsDto> roles = rolePermissionsMap.entrySet().stream()
+                    .map(entry -> new RolePermissionsDto(entry.getKey(), entry.getValue()))
+                    .collect(Collectors.toList());
+
+            return new UserWithRolesAndPermissionsDto(user.getId(), user.getUsername(), roles);
         }).collect(Collectors.toList());
     }
 
@@ -86,42 +105,6 @@ public class RoleServiceImpl implements RoleService {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void assignPermissionsToRole(Long roleId, List<Long> permissionIds) {
-        if (roleId == null) {
-            throw new IllegalArgumentException("El ID del rol no puede ser null.");
-        }
-
-        if (permissionIds == null || permissionIds.isEmpty()) {
-            throw new IllegalArgumentException("La lista de IDs de permisos no puede ser null ni vacía.");
-        }
-
-        if (permissionIds.contains(null)) {
-            throw new IllegalArgumentException("La lista de IDs de permisos no puede contener valores null.");
-        }
-
-        Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new EntityNotFoundException("Rol no encontrado con ID: " + roleId));
-
-        List<Permission> permissions = StreamSupport
-                .stream(permissionRepository.findAllById(permissionIds).spliterator(), false)
-                .collect(Collectors.toList());
-
-        // Validar si realmente se encontraron todos los permisos
-        if (permissions.size() != permissionIds.size()) {
-            throw new EntityNotFoundException("No se encontraron todos los permisos con los IDs proporcionados.");
-        }
-
-        for (Permission permission : permissions) {
-            if (!rolePermissionRepository.existsByRoleAndPermission(role, permission)) {
-                RolePermission rolePermission = new RolePermission();
-                rolePermission.setRole(role);
-                rolePermission.setPermission(permission);
-                rolePermissionRepository.save(rolePermission);
-            }
-        }
     }
 
     @Transactional

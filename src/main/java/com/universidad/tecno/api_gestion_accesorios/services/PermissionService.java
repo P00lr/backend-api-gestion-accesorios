@@ -11,4 +11,6 @@ public interface PermissionService {
     Optional<Permission> update(Long id, Permission permission);
     Permission save(Permission permission);
     boolean deleteById(Long id); 
+
+    void assignPermissionsToRole(Long roleId, List<Long> permissionIds);
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.universidad.tecno.api_gestion_accesorios.dto.UserRolePermissionsResponseDto;
+import com.universidad.tecno.api_gestion_accesorios.dto.user.UserWithRolesAndPermissionsDto;
 import com.universidad.tecno.api_gestion_accesorios.entities.User;
 import com.universidad.tecno.api_gestion_accesorios.services.UserService;
 
@@ -37,6 +37,11 @@ public class UserController {
         return userService.findById(id)
                 .map(user -> ResponseEntity.ok(user))
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+    @GetMapping("/with-roles-and-permissions")
+    public ResponseEntity<List<UserWithRolesAndPermissionsDto>> listUsersWithRolesAndPermissions() {
+        List<UserWithRolesAndPermissionsDto> result = userService.getUsersWithRolesAndPermissions();
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping
@@ -61,10 +66,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    @GetMapping("/with-permissions")
-    public ResponseEntity<List<UserRolePermissionsResponseDto>> getAllUserRolePermissions() {
-        List<UserRolePermissionsResponseDto> result = userService.getAllUserRolePermissions();
-        return ResponseEntity.ok(result);
-    }
+   
 
 }

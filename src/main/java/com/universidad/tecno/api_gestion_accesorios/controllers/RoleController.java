@@ -14,15 +14,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.universidad.tecno.api_gestion_accesorios.dto.AssignRolePermissionsToUserRequest;
-import com.universidad.tecno.api_gestion_accesorios.dto.RoleWithPermissionsDto;
+import com.universidad.tecno.api_gestion_accesorios.dto.role.RoleWithPermissionsDto;
+import com.universidad.tecno.api_gestion_accesorios.dto.user.AssignRolePermissionsToUserRequest;
 import com.universidad.tecno.api_gestion_accesorios.entities.Role;
 import com.universidad.tecno.api_gestion_accesorios.services.RoleService;
 import com.universidad.tecno.api_gestion_accesorios.services.UserService;
 
 @RestController
 @RequestMapping("/api/roles")
-public class RolController {
+public class RoleController {
 
     @Autowired
     private RoleService roleService;
@@ -54,7 +54,7 @@ public class RolController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRole);
     }
 
-    // asigna roles a los users
+    // asigna rolePermiso a los users
     @PostMapping("/assign-role-permissions")
     public ResponseEntity<String> assignRolePermissionsToUser(@RequestBody AssignRolePermissionsToUserRequest request) {
         userService.assignRolePermissions(request.getUserId(), request.getRolePermissionIds());

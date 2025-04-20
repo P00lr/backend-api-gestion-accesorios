@@ -1,4 +1,4 @@
-package com.universidad.tecno.api_gestion_accesorios.dto;
+package com.universidad.tecno.api_gestion_accesorios.dto.role;
 
 import java.util.List;
 

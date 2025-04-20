@@ -3,7 +3,8 @@ package com.universidad.tecno.api_gestion_accesorios.services;
 import java.util.List;
 import java.util.Optional;
 
-import com.universidad.tecno.api_gestion_accesorios.dto.RoleWithPermissionsDto;
+import com.universidad.tecno.api_gestion_accesorios.dto.role.RoleWithPermissionsDto;
+import com.universidad.tecno.api_gestion_accesorios.dto.user.UserWithRolesAndPermissionsDto;
 import com.universidad.tecno.api_gestion_accesorios.entities.Role;
 
 public interface RoleService {
@@ -14,6 +15,7 @@ public interface RoleService {
     Optional<Role> update(Long id, Role role);
     boolean deleteById(Long id);
 
-    void assignPermissionsToRole(Long roleId, List<Long> permissionIds);
     List<RoleWithPermissionsDto> getRolesWithPermissions();
+
+    List<UserWithRolesAndPermissionsDto> getUsersWithRolesAndPermissions();
 }
