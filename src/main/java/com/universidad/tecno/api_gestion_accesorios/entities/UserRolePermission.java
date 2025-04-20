@@ -1,53 +1,46 @@
 package com.universidad.tecno.api_gestion_accesorios.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "users_roles_permissions")
+@Table(name = "users_roles_permissions", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"user_id", "role_permission_id"})
+})
 public class UserRolePermission {
 
-    @EmbeddedId
-    private UserRolePermissionId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
-    @MapsId("userId")
-    @JsonIgnoreProperties({"userRolePermissions", "handler", "hibernateLazyInitializer"})
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @MapsId("roleId")
-    @JsonIgnoreProperties({"userRolePermissions", "handler", "hibernateLazyInitializer"})
-    private Role role;
-
-    @ManyToOne
-    @MapsId("permissionId")
-    @JsonIgnoreProperties({"userRolePermissions", "handler", "hibernateLazyInitializer"})
-    private Permission permission;
-
-    
+    @JoinColumn(name = "role_permission_id", nullable = false)
+    private RolePermission rolePermission;
 
     public UserRolePermission() {
     }
 
-    public UserRolePermission(UserRolePermissionId id, User user, Role role, Permission permission) {
-        this.id = id;
+    public UserRolePermission(User user, RolePermission rolePermission) {
         this.user = user;
-        this.role = role;
-        this.permission = permission;
+        this.rolePermission = rolePermission;
     }
 
-
-    public UserRolePermissionId getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UserRolePermissionId id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -59,22 +52,11 @@ public class UserRolePermission {
         this.user = user;
     }
 
-    public Role getRole() {
-        return role;
+    public RolePermission getRolePermission() {
+        return rolePermission;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
+    public void setRolePermission(RolePermission rolePermission) {
+        this.rolePermission = rolePermission;
     }
-
-    public Permission getPermission() {
-        return permission;
-    }
-
-    public void setPermission(Permission permission) {
-        this.permission = permission;
-    }
-
-    
-
 }

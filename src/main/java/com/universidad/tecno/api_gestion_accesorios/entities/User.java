@@ -6,6 +6,8 @@ import static jakarta.persistence.GenerationType.*;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -25,6 +27,7 @@ public class User {
     private boolean enabled;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+    @JsonIgnore
     private List<UserRolePermission> userRolePermissions;
 
     
