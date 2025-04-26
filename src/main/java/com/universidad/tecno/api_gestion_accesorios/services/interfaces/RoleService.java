@@ -1,4 +1,4 @@
-package com.universidad.tecno.api_gestion_accesorios.services;
+package com.universidad.tecno.api_gestion_accesorios.services.interfaces;
 
 import java.util.List;
 import java.util.Optional;

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.universidad.tecno.api_gestion_accesorios.dto.user.UserWithRolesAndPermissionsDto;
 import com.universidad.tecno.api_gestion_accesorios.entities.User;
-import com.universidad.tecno.api_gestion_accesorios.services.UserService;
+import com.universidad.tecno.api_gestion_accesorios.services.interfaces.UserService;
 
 @RestController
 @RequestMapping("/api/users")

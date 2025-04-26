@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.universidad.tecno.api_gestion_accesorios.dto.role.RoleWithPermissionsDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.user.AssignRolePermissionsToUserRequest;
 import com.universidad.tecno.api_gestion_accesorios.entities.Role;
-import com.universidad.tecno.api_gestion_accesorios.services.RoleService;
-import com.universidad.tecno.api_gestion_accesorios.services.UserService;
+import com.universidad.tecno.api_gestion_accesorios.services.interfaces.RoleService;
+import com.universidad.tecno.api_gestion_accesorios.services.interfaces.UserService;
 
 @RestController
 @RequestMapping("/api/roles")

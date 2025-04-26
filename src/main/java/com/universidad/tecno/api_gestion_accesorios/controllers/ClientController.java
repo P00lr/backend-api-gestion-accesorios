@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.universidad.tecno.api_gestion_accesorios.entities.Client;
-import com.universidad.tecno.api_gestion_accesorios.services.ClientService;
+import com.universidad.tecno.api_gestion_accesorios.services.interfaces.ClientService;
 
 @RestController
 @RequestMapping("/api/clients")

@@ -1,4 +1,4 @@
-package com.universidad.tecno.api_gestion_accesorios.services;
+package com.universidad.tecno.api_gestion_accesorios.services.impl;
 
 import java.util.List;
 import java.util.Map;
@@ -19,6 +19,7 @@ import com.universidad.tecno.api_gestion_accesorios.repositories.RolePermissionR
 import com.universidad.tecno.api_gestion_accesorios.repositories.RoleRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.UserRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.UserRolePermissionRepository;
+import com.universidad.tecno.api_gestion_accesorios.services.interfaces.RoleService;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;

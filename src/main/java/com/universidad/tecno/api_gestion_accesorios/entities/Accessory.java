@@ -12,6 +12,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 //import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -27,9 +28,12 @@ public class Accessory {
     private String name;
     private Double price;
     private String description;
+    private String brand;
+    private String model;
 
-    /* @ManyToOne
-    private Laboratorio laboratorio; */
+
+    @ManyToOne
+    private Category category;
 
     //no muestra nada de venta. correcto
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -37,6 +41,7 @@ public class Accessory {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "accessory")
     private List<SaleDetail> saleDetails;
 
+    //no muestra nada de almacen. correcto
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @JsonIgnoreProperties({"accessory", "handler", "hibernateLazyInitializer"})
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "accessory")
@@ -80,12 +85,25 @@ public class Accessory {
     public void setSaleDetails(List<SaleDetail> saleDetails) {
         this.saleDetails = saleDetails;
     }
-    /* public Laboratorio getLaboratorio() {
-        return laboratorio;
+   
+    public String getBrand() {
+        return brand;
     }
-    public void setLaboratorio(Laboratorio laboratorio) {
-        this.laboratorio = laboratorio;
-    } */
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+    public String getModel() {
+        return model;
+    }
+    public void setModel(String model) {
+        this.model = model;
+    }
+    public Category getCategory() {
+        return category;
+    }
+    public void setCategory(Category category) {
+        this.category = category;
+    }
     public List<WarehouseDetail> getWarehouseDetails() {
         return warehouseDetails;
     }

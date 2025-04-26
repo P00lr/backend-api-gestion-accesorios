@@ -1,4 +1,4 @@
-package com.universidad.tecno.api_gestion_accesorios.services;
+package com.universidad.tecno.api_gestion_accesorios.services.impl;
 
 import java.util.List;
 import java.util.Map;
@@ -17,6 +17,7 @@ import com.universidad.tecno.api_gestion_accesorios.entities.UserRolePermission;
 import com.universidad.tecno.api_gestion_accesorios.repositories.RolePermissionRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.UserRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.UserRolePermissionRepository;
+import com.universidad.tecno.api_gestion_accesorios.services.interfaces.UserService;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -49,7 +50,6 @@ public class UserServiceImpl implements UserService {
                                     urp -> urp.getRolePermission().getPermission().getName(),
                                     Collectors.toList())));
 
-            // Convertir a DTOs
             List<RolePermissionsDto> roles = rolePermissionsMap.entrySet().stream()
                     .map(entry -> new RolePermissionsDto(entry.getKey(), entry.getValue()))
                     .collect(Collectors.toList());

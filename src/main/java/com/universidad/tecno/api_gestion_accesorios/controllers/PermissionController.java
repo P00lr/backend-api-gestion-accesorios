@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.universidad.tecno.api_gestion_accesorios.dto.role.RolePermissionAssignmentDto;
 import com.universidad.tecno.api_gestion_accesorios.entities.Permission;
-import com.universidad.tecno.api_gestion_accesorios.services.PermissionService;
+import com.universidad.tecno.api_gestion_accesorios.services.interfaces.PermissionService;
 
 @RestController
 @RequestMapping("/api/permissions")

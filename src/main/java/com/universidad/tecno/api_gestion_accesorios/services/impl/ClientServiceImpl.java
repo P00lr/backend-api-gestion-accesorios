@@ -1,4 +1,4 @@
-package com.universidad.tecno.api_gestion_accesorios.services;
+package com.universidad.tecno.api_gestion_accesorios.services.impl;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.universidad.tecno.api_gestion_accesorios.entities.Client;
 import com.universidad.tecno.api_gestion_accesorios.repositories.ClientRepository;
+import com.universidad.tecno.api_gestion_accesorios.services.interfaces.ClientService;
 
 
 @Service
