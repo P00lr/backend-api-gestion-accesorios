@@ -1,55 +1,45 @@
 package com.universidad.tecno.api_gestion_accesorios.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "purchase_details")
+@Table(name = "purchase_details", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"purchase_id", "warehouse_detail_id"})
+})
 public class PurchaseDetail {
 
-    @EmbeddedId
-    private PurchaseDetailId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private Double amountType;
     private Integer quantityType;
 
     @ManyToOne
-    @JsonIgnoreProperties({"purchaseDetails", "handler", "hibernateLazyInitializer"})
-    @MapsId("purchaseId")
+    @JoinColumn(name = "purchase_id", nullable = false)
     private Purchase purchase;
 
     @ManyToOne
-    @JsonIgnoreProperties({"purchaseDetails", "handler", "hibernateLazyInitializer"})
-    @MapsId("accessoryId")
-    private Accessory accessory;
-
-    
+    @JoinColumn(name = "warehouse_detail_id", nullable = false)    
+    private WarehouseDetail warehouseDetail;
 
     public PurchaseDetail() {
     }
-
     
-    public PurchaseDetail(PurchaseDetailId id, Double amountType, Integer quantityType, Purchase purchase,
-            Accessory accessory) {
+    public PurchaseDetail(Long id, Double amountType, Integer quantityType, Purchase purchase,
+            WarehouseDetail warehouseDetail) {
         this.id = id;
         this.amountType = amountType;
         this.quantityType = quantityType;
         this.purchase = purchase;
-        this.accessory = accessory;
-    }
-
-
-    public PurchaseDetailId getId() {
-        return id;
-    }
-
-    public void setId(PurchaseDetailId id) {
-        this.id = id;
+        this.warehouseDetail = warehouseDetail;
     }
 
     public Double getAmountType() {
@@ -76,13 +66,23 @@ public class PurchaseDetail {
         this.purchase = purchase;
     }
 
-    public Accessory getAccessory() {
-        return accessory;
+    public WarehouseDetail getWarehouseDetail() {
+        return warehouseDetail;
     }
 
-    public void setAccessory(Accessory accessory) {
-        this.accessory = accessory;
+    public void setWarehouseDetail(WarehouseDetail warehouseDetail) {
+        this.warehouseDetail = warehouseDetail;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    
 
     
 }

@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -29,17 +30,29 @@ public class Purchase {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "purchase")
     private List<PurchaseDetail> purchaseDetails;
 
+    @ManyToOne
+    private User user;
+
+    @ManyToOne
+    private Supplier supplier;
+
     public Purchase() {
     }
 
+    
+
     public Purchase(Long id, Double totalAmount, Integer totalQuantity, LocalDateTime purchaseDate,
-            List<PurchaseDetail> purchaseDetails) {
+            List<PurchaseDetail> purchaseDetails, User user, Supplier supplier) {
         this.id = id;
         this.totalAmount = totalAmount;
         this.totalQuantity = totalQuantity;
         this.purchaseDate = purchaseDate;
         this.purchaseDetails = purchaseDetails;
+        this.user = user;
+        this.supplier = supplier;
     }
+
+
 
     public Long getId() {
         return id;
@@ -79,6 +92,22 @@ public class Purchase {
 
     public void setPurchaseDetails(List<PurchaseDetail> purchaseDetails) {
         this.purchaseDetails = purchaseDetails;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
     }
 
     

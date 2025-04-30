@@ -48,11 +48,11 @@ public class RoleServiceImpl implements RoleService {
         List<Role> roles = (List<Role>) roleRepository.findAll();
 
         return roles.stream().map(role -> {
-            List<String> permisos = role.getRolePermissions().stream()
+            List<String> permission = role.getRolePermissions().stream()
                     .map(rp -> rp.getPermission().getName()) // Extraemos el nombre del permiso
                     .collect(Collectors.toList());
 
-            return new RoleWithPermissionsDto(role.getId(), role.getName(), permisos);
+            return new RoleWithPermissionsDto(role.getId(), role.getName(), permission);
         }).collect(Collectors.toList());
     }
 

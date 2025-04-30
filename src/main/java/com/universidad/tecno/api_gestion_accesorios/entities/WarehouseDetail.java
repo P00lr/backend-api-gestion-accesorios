@@ -1,52 +1,61 @@
 package com.universidad.tecno.api_gestion_accesorios.entities;
 
+
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name ="warehouseDetails")
+@Table(name ="warehouse_details", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"accessory_id", "warehouse_id"})
+})
 public class WarehouseDetail {
 
-    @EmbeddedId
-    private WarehouseDetailId id;
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String state;
     private Integer stock;
-
+    
     @ManyToOne
-    @JsonIgnoreProperties({"warehouseDetails", "handler", "hibernateLazyInitializer"})
-    @MapsId("warehouseId")
+    @JoinColumn(name = "accessory_id", nullable = false)
+    private Accessory accessory;
+    
+    @ManyToOne
+    @JoinColumn(name = "warehouse_id", nullable = false)
     private Warehouse warehouse;
 
-    @ManyToOne
-    @JsonIgnoreProperties({"warehouseDetails", "handler", "hibernateLazyInitializer"})
-    @MapsId("accessoryId")
-    private Accessory accessory;
+    @JsonIgnoreProperties({"warehouseDetail", "sale", "handler", "hibernateLazyInitializer"})
+    @OneToMany(mappedBy = "warehouseDetail", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SaleDetail> saleDetails;
 
-    
+    @JsonIgnoreProperties({"warehouseDetail", "purchase", "handler", "hibernateLazyInitializer"})
+    @OneToMany(mappedBy = "warehouseDetail", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PurchaseDetail> purchaseDetails;
+
     public WarehouseDetail() {
     }
 
-    public WarehouseDetail(WarehouseDetailId id, String state, Integer stock, Warehouse warehouse,
-            Accessory accessory) {
+    public WarehouseDetail(Long id, String state, Integer stock, Accessory accessory, Warehouse warehouse,
+            List<SaleDetail> saleDetails, List<PurchaseDetail> purchaseDetails) {
         this.id = id;
         this.state = state;
         this.stock = stock;
-        this.warehouse = warehouse;
         this.accessory = accessory;
-    }
-
-    public WarehouseDetailId getId() {
-        return id;
-    }
-
-    public void setId(WarehouseDetailId id) {
-        this.id = id;
+        this.warehouse = warehouse;
+        this.saleDetails = saleDetails;
+        this.purchaseDetails = purchaseDetails;
     }
 
     public String getState() {
@@ -81,7 +90,28 @@ public class WarehouseDetail {
         this.accessory = accessory;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public List<SaleDetail> getSaleDetails() {
+        return saleDetails;
+    }
+
+    public void setSaleDetails(List<SaleDetail> saleDetails) {
+        this.saleDetails = saleDetails;
+    }
+
+    public List<PurchaseDetail> getPurchaseDetails() {
+        return purchaseDetails;
+    }
+
+    public void setPurchaseDetails(List<PurchaseDetail> purchaseDetails) {
+        this.purchaseDetails = purchaseDetails;
+    }
     
-
-
 }

@@ -28,7 +28,6 @@ public class Role {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "role")
     private List<RolePermission> rolePermissions;
 
-
     public Long getId() {
         return id;
     }

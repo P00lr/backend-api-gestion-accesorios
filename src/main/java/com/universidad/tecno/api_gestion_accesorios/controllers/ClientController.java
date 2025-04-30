@@ -38,8 +38,8 @@ public class ClientController {
 
     @PostMapping
     public ResponseEntity<Client> createClient(@RequestBody Client client) {
-        Client clientOp = clientService.save(client);
-        return ResponseEntity.status(HttpStatus.CREATED).body(clientOp);
+        Client newClient = clientService.save(client);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newClient);
     }
 
     @PutMapping("/{id}")

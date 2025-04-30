@@ -26,8 +26,8 @@ public class Sale {
     private Integer totalQuantity;
     private LocalDateTime saleDate;
 
-    //principal, si muestra a a los accesorios
-    @JsonIgnoreProperties({"sale", "handler", "hibernateLazyInitializer"})
+    //principal, si muestra a los accesorios
+    @JsonIgnoreProperties({"sale", "warehouseDetail", "handler", "hibernateLazyInitializer"})
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "sale")
     private List<SaleDetail> saleDetails;
     

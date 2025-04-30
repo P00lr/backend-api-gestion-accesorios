@@ -1,7 +1,6 @@
 package com.universidad.tecno.api_gestion_accesorios.entities;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -13,7 +12,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-//import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -35,12 +33,6 @@ public class Accessory {
     @ManyToOne
     private Category category;
 
-    //no muestra nada de venta. correcto
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @JsonIgnoreProperties({"accessory", "handler", "hibernateLazyInitializer"})
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "accessory")
-    private List<SaleDetail> saleDetails;
-
     //no muestra nada de almacen. correcto
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @JsonIgnoreProperties({"accessory", "handler", "hibernateLazyInitializer"})
@@ -48,7 +40,6 @@ public class Accessory {
     private List<WarehouseDetail> warehouseDetails;
     
     public Accessory() {
-        saleDetails = new ArrayList<>();
     }
     public Accessory(Long id) {
         this.id = id;
@@ -77,13 +68,6 @@ public class Accessory {
     }
     public void setDescription(String description) {
         this.description = description;
-    }
-   
-    public List<SaleDetail> getSaleDetails() {
-        return saleDetails;
-    }
-    public void setSaleDetails(List<SaleDetail> saleDetails) {
-        this.saleDetails = saleDetails;
     }
    
     public String getBrand() {
