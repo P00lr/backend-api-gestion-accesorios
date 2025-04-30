@@ -10,10 +10,10 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "adjustment_details", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"adjustment_id", "warehouse_detail_id"})
+@Table(name = "transfer_details", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"transfer_id", "warehouse_detail_id"})
 })
-public class AdjustmentDetail {
+public class TransferDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,21 +21,44 @@ public class AdjustmentDetail {
     private Integer quantity;
 
     @ManyToOne
-    @JoinColumn(name = "adjustment_id", nullable = false)
-    private Adjustment adjustment;
+    @JoinColumn(name = "transfer_id", nullable = false)
+    private Transfer transfer;
 
     @ManyToOne
-    @JoinColumn(name = "warehouse_detail_id", nullable = false)
+    @JoinColumn(name = "warehouse_detail_id", nullable =  false)
     private WarehouseDetail warehouseDetail;
 
-    
-    public AdjustmentDetail() {
+    public TransferDetail() {
     }
 
-    public AdjustmentDetail(Long id, Integer quantity, Adjustment adjustment, WarehouseDetail warehouseDetail) {
+    public TransferDetail(Long id, Integer quantity, Transfer transfer, WarehouseDetail warehouseDetail) {
         this.id = id;
         this.quantity = quantity;
-        this.adjustment = adjustment;
+        this.transfer = transfer;
+        this.warehouseDetail = warehouseDetail;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public Transfer getTransfer() {
+        return transfer;
+    }
+
+    public void setTransfer(Transfer transfer) {
+        this.transfer = transfer;
+    }
+
+    public WarehouseDetail getWarehouseDetail() {
+        return warehouseDetail;
+    }
+
+    public void setWarehouseDetail(WarehouseDetail warehouseDetail) {
         this.warehouseDetail = warehouseDetail;
     }
 
@@ -47,28 +70,5 @@ public class AdjustmentDetail {
         this.id = id;
     }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public Adjustment getAdjustment() {
-        return adjustment;
-    }
-
-    public void setAdjustment(Adjustment adjustment) {
-        this.adjustment = adjustment;
-    }
-
-    public WarehouseDetail getWarehouseDetail() {
-        return warehouseDetail;
-    }
-
-    public void setWarehouseDetail(WarehouseDetail warehouseDetail) {
-        this.warehouseDetail = warehouseDetail;
-    }
     
 }

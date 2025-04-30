@@ -29,6 +29,7 @@ public class Warehouse {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "warehouse")
     private List<WarehouseDetail> warehouseDetails;
 
+
     public Long getId() {
         return id;
     }

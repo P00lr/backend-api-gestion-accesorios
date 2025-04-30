@@ -12,4 +12,7 @@ public interface WarehouseDetailRepository extends CrudRepository<WarehouseDetai
     //Definir un método de consulta personalizado para encontrar un WarehouseDetail por WarehouseId y AccessoryId
     @Query("SELECT wd FROM WarehouseDetail wd WHERE wd.warehouse.id = :warehouseId AND wd.accessory.id = :accessoryId")
     Optional<WarehouseDetail> findByWarehouseIdAndAccessoryId(Long warehouseId, Long accessoryId);
+
+    Optional<WarehouseDetail> findByAccessoryIdAndWarehouseId(Long accessoryId, Long warehouseId);
+
 }

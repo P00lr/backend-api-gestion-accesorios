@@ -36,19 +36,30 @@ public class WarehouseDetail {
     @JoinColumn(name = "warehouse_id", nullable = false)
     private Warehouse warehouse;
 
+    
     @JsonIgnoreProperties({"warehouseDetail", "sale", "handler", "hibernateLazyInitializer"})
     @OneToMany(mappedBy = "warehouseDetail", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SaleDetail> saleDetails;
-
+    
     @JsonIgnoreProperties({"warehouseDetail", "purchase", "handler", "hibernateLazyInitializer"})
     @OneToMany(mappedBy = "warehouseDetail", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseDetail> purchaseDetails;
+    
+    @JsonIgnoreProperties({"warehouseDetail", "transfer", "handler", "hibernateLazyInitializer"})
+    @OneToMany(mappedBy = "warehouseDetail", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TransferDetail> transferDetails;
+    
+    @JsonIgnoreProperties({"warehouseDetail", "adjustment", "handler", "hibernateLazyInitializer"})
+    @OneToMany(mappedBy = "warehouseDetail", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AdjustmentDetail> adjustmentDetails;
+    
 
     public WarehouseDetail() {
     }
 
     public WarehouseDetail(Long id, String state, Integer stock, Accessory accessory, Warehouse warehouse,
-            List<SaleDetail> saleDetails, List<PurchaseDetail> purchaseDetails) {
+            List<SaleDetail> saleDetails, List<PurchaseDetail> purchaseDetails, List<TransferDetail> transferDetails,
+            List<AdjustmentDetail> adjustmentDetails) {
         this.id = id;
         this.state = state;
         this.stock = stock;
@@ -56,6 +67,8 @@ public class WarehouseDetail {
         this.warehouse = warehouse;
         this.saleDetails = saleDetails;
         this.purchaseDetails = purchaseDetails;
+        this.transferDetails = transferDetails;
+        this.adjustmentDetails = adjustmentDetails;
     }
 
     public String getState() {
@@ -112,6 +125,14 @@ public class WarehouseDetail {
 
     public void setPurchaseDetails(List<PurchaseDetail> purchaseDetails) {
         this.purchaseDetails = purchaseDetails;
+    }
+
+    public List<TransferDetail> getTransferDetails() {
+        return transferDetails;
+    }
+
+    public void setTransferDetails(List<TransferDetail> transferDetails) {
+        this.transferDetails = transferDetails;
     }
     
 }

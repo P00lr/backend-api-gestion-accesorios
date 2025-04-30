@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.universidad.tecno.api_gestion_accesorios.dto.purchase.CreatePurchaseDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.purchase.GetPurchaseDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.purchase.ListPurchaseDto;
-import com.universidad.tecno.api_gestion_accesorios.entities.Purchase;
 import com.universidad.tecno.api_gestion_accesorios.services.interfaces.PurchaseService;
 
 @RestController
@@ -25,12 +24,6 @@ public class PurchaseController {
     @Autowired
     private PurchaseService purchaseService;
 
-    /*
-     * @GetMapping
-     * public List<Purchase> getPurchases() {
-     * return (List<Purchase>) purchaseService.findAll();
-     * }
-     */
     @GetMapping("/{id}")
     public ResponseEntity<GetPurchaseDto> getPurchaseById(@PathVariable Long id) {
         return purchaseService.getPurchaseById(id)
