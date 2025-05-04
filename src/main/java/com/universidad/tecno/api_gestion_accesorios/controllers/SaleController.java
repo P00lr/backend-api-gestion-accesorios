@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.universidad.tecno.api_gestion_accesorios.dto.sale.CreateSaleDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.sale.GetSaleDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.sale.ListSaleDto;
-import com.universidad.tecno.api_gestion_accesorios.entities.Sale;
 import com.universidad.tecno.api_gestion_accesorios.services.interfaces.SaleService;
 
 @RestController
@@ -51,13 +50,13 @@ public class SaleController {
     }
 
     @PostMapping
-    public ResponseEntity<Sale> createSale(@RequestBody CreateSaleDto createSaleDto) {
+    public ResponseEntity<String> createSale(@RequestBody CreateSaleDto createSaleDto) {
         try {
-            Sale sale = saleService.createSale(createSaleDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(sale);
+            saleService.createSale(createSaleDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Venta realizada correctamente");
         } catch (RuntimeException e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error en la venta");
         }
     }
 

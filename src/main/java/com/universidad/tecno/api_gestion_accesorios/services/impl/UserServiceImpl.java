@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.universidad.tecno.api_gestion_accesorios.dto.role.RolePermissionsDto;
@@ -24,6 +25,8 @@ import jakarta.persistence.EntityNotFoundException;
 @Service
 public class UserServiceImpl implements UserService {
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Autowired
     private UserRepository userRepository;
 
@@ -65,6 +68,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User save(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -76,9 +80,12 @@ public class UserServiceImpl implements UserService {
             if (user.getUsername() != null)
                 existingUser.setUsername(user.getUsername());
             if (user.getPassword() != null)
-                existingUser.setPassword(user.getPassword());
+                existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
             if (user.getEmail() != null)
                 existingUser.setEmail(user.getEmail());
+            if (user.isEnabled() != null)
+                existingUser.setEnabled(user.isEnabled());
+
             return userRepository.save(existingUser);
         });
     }
@@ -102,7 +109,8 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + userId));
 
-        List<RolePermission> rolePermissions = (List<RolePermission>) rolePermissionRepository.findAllById(rolePermissionIds);
+        List<RolePermission> rolePermissions = (List<RolePermission>) rolePermissionRepository
+                .findAllById(rolePermissionIds);
 
         if (rolePermissions.isEmpty()) {
             throw new EntityNotFoundException("No se encontraron RolePermissions con los IDs proporcionados.");
