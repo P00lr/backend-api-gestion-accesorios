@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.universidad.tecno.api_gestion_accesorios.entities.Client;
@@ -16,6 +18,11 @@ public class ClientServiceImpl implements ClientService {
 
     @Autowired
     private ClientRepository clientRepository;
+
+     @Override
+    public Page<Client> paginateAll(Pageable pageable) {
+        return this.clientRepository.findAll(pageable);
+    }
 
     @Override
     public List<Client> findAll() {
@@ -38,8 +45,8 @@ public class ClientServiceImpl implements ClientService {
                 existingClient.setPassword(client.getPassword());
             if (client.getEmail() != null)
                 existingClient.setEmail(client.getEmail());
-            if (client.getFechaNaciemiento() != null)
-                existingClient.setFechaNaciemiento(client.getFechaNaciemiento());
+            if (client.getFechaNacimiento() != null)
+                existingClient.setFechaNacimiento(client.getFechaNacimiento());
             return clientRepository.save(existingClient);
         });
     }
@@ -59,4 +66,5 @@ public class ClientServiceImpl implements ClientService {
         return false;
     }
 
+   
 }

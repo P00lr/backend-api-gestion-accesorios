@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.universidad.tecno.api_gestion_accesorios.dto.transfer.CreateTransferDetailDto;
@@ -41,9 +43,19 @@ public class TransferServiceImpl implements TransferService {
     private WarehouseDetailRepository warehouseDetailRepository;
 
     @Override
+    public Page<ListTransferDto> paginateAll(Pageable pageable) {
+        Page<Transfer> transfersPage = transferRepository.findAll(pageable);
+
+        return transfersPage.map(t -> new ListTransferDto(
+                t.getId(),
+                t.getDescription(),
+                t.getDate(),
+                t.getUser().getName()));
+    }
+
+    @Override
     public List<ListTransferDto> findAll() {
-        List<Transfer> transfers = (List<Transfer>) transferRepository.findAll(); // Necesitarás cambiar a JpaRepository
-                                                                                  // para usar
+        List<Transfer> transfers = (List<Transfer>) transferRepository.findAll();
         return transfers.stream()
                 .map(t -> new ListTransferDto(
                         t.getId(),
@@ -144,7 +156,7 @@ public class TransferServiceImpl implements TransferService {
     public boolean deleteTransfer(Long id) {
         Optional<Transfer> existingTransfer = transferRepository.findById(id);
 
-        if(existingTransfer.isPresent()) {
+        if (existingTransfer.isPresent()) {
             transferRepository.deleteById(id);
             return true;
         }

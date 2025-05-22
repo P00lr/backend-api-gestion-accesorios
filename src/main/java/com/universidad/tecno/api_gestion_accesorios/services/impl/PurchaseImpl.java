@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.universidad.tecno.api_gestion_accesorios.dto.purchase.CreatePurchaseDetailDto;
@@ -41,6 +43,21 @@ public class PurchaseImpl implements PurchaseService {
 
     @Autowired
     private WarehouseDetailRepository warehouseDetailRepository;
+
+    @Override
+    public Page<ListPurchaseDto> paginateAll(Pageable pageable) {
+        return purchaseRepository.findAll(pageable)
+                .map(purchase -> {
+                    ListPurchaseDto dto = new ListPurchaseDto();
+                    dto.setId(purchase.getId());
+                    dto.setTotalAmount(purchase.getTotalAmount());
+                    dto.setTotalQuantity(purchase.getTotalQuantity());
+                    dto.setPurchaseDate(purchase.getPurchaseDate());
+                    dto.setSupplierId(purchase.getSupplier().getId());
+                    dto.setUserId(purchase.getUser().getId());
+                    return dto;
+                });
+    }
 
     @Override
     public List<Purchase> findAll() {
@@ -91,6 +108,7 @@ public class PurchaseImpl implements PurchaseService {
         });
     }
 
+    // NOTA: AL COMPRAR SE PUEDE AGREGAR LA CANTIDAD A CUALQUIER ALMACEN EXISTENTE
     @Override
     @Transactional
     public Purchase createPurchase(CreatePurchaseDto purchaseDto) {

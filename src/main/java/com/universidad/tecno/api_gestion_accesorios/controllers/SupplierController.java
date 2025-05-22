@@ -1,8 +1,10 @@
 package com.universidad.tecno.api_gestion_accesorios.controllers;
 
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,9 +26,11 @@ public class SupplierController {
     @Autowired
     private SupplierService supplierService;
 
-    @GetMapping
-    public List<Supplier> getSuppliers() {
-        return supplierService.findAll();
+    @GetMapping("/page/{page}")
+    public ResponseEntity<?> listPageable(@PathVariable Integer page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<Supplier> suppliers = supplierService.paginateAll(pageable);
+        return ResponseEntity.ok(suppliers);
     }
 
     @GetMapping("/{id}")
@@ -53,7 +57,7 @@ public class SupplierController {
     public ResponseEntity<String> deleteSupplier(@PathVariable Long id) {
         boolean deletedSupplier = supplierService.deleteById(id);
         if(deletedSupplier) {
-            return ResponseEntity.ok().body("Eliminado correctamente");
+            return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error al eliminar");
 

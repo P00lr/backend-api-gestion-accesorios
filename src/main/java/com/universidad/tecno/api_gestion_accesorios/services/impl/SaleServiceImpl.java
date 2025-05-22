@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.universidad.tecno.api_gestion_accesorios.dto.sale.CreateSaleDetailDto;
@@ -57,9 +59,25 @@ public class SaleServiceImpl implements SaleService {
     }
 
     @Override
+    public Page<ListSaleDto> paginateAll(Pageable pageable) {
+        Page<Sale> salesPage = saleRepository.findAll(pageable);
+
+        return salesPage.map(sale -> {
+            ListSaleDto dto = new ListSaleDto();
+            dto.setId(sale.getId());
+            dto.setTotalAmount(sale.getTotalAmount());
+            dto.setTotalQuantity(sale.getTotalQuantity());
+            dto.setSaleDate(sale.getSaleDate());
+            dto.setClientId(sale.getClient().getId());
+            dto.setUserId(sale.getUser().getId());
+            return dto;
+        });
+    }
+
+    @Override
     public List<ListSaleDto> getAllSales() {
         List<Sale> sales = (List<Sale>) saleRepository.findAll();
-    
+
         return sales.stream().map(sale -> {
             ListSaleDto dto = new ListSaleDto();
             dto.setId(sale.getId());
@@ -120,6 +138,7 @@ public class SaleServiceImpl implements SaleService {
         return Optional.of(saleDto); // Devolver el SaleDto envuelto en Optional
     }
 
+    //NOTA: LA EL ACCESORIO TIENE QUE ESTAR OBLLIGATORIAMENTE EN EL ALMACEN 1 PARA LA VENTA
     @Transactional
     public Sale createSale(CreateSaleDto saleDto) {
         // Obtener cliente y usuario

@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.universidad.tecno.api_gestion_accesorios.entities.Warehouse;
@@ -15,6 +17,12 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Autowired
     private WarehouseRepository warehouseRepository;
+
+    @Override
+    public Page<Warehouse> paginateAll(Pageable pageable) {
+        return warehouseRepository.findAll(pageable);
+    }
+
 
     @Override
     public List<Warehouse> findAll() {
@@ -52,4 +60,5 @@ public class WarehouseServiceImpl implements WarehouseService {
         return false;
     }
 
+    
 }

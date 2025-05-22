@@ -7,6 +7,7 @@ public class AccessoryWithCategoryDto {
     private String description;
     private String brand;
     private String model;
+    private Long categoryId;
     private String categoryName;
     
     
@@ -78,6 +79,14 @@ public class AccessoryWithCategoryDto {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 
     

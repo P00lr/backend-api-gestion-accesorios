@@ -3,6 +3,9 @@ package com.universidad.tecno.api_gestion_accesorios.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +28,13 @@ public class AdjustmentController {
     @Autowired
     private AdjustmentService adjustmentService;
 
+    @GetMapping("/page/{page}")
+    public ResponseEntity<Page<ListAdjustmentDto>> getAdjustmentsByPage(@PathVariable int page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<ListAdjustmentDto> pagedAdjustments = adjustmentService.paginateAll(pageable);
+        return ResponseEntity.ok(pagedAdjustments);
+    }
+
     @GetMapping
     public ResponseEntity<List<ListAdjustmentDto>> getAllAdjustments() {
         return ResponseEntity.ok(adjustmentService.findAll());
@@ -39,10 +49,10 @@ public class AdjustmentController {
     public ResponseEntity<String> createAdjustment(@RequestBody CreateAdjustmentDto dto) {
         try {
             adjustmentService.createAdjustment(dto);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Ajuste registrado exitosamente");
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al registrar ajuste: " + e.getMessage());
+                    .build();
         }
     }
 
@@ -50,8 +60,8 @@ public class AdjustmentController {
     public ResponseEntity<String> deleteAdjustment(@PathVariable Long id) {
         boolean deleted = adjustmentService.deleteById(id);
         if (deleted) {
-            return ResponseEntity.ok().body("Eliminado correctamente");
+            return ResponseEntity.ok().build();
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al eliminar");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }

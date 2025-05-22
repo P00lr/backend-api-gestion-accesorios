@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.universidad.tecno.api_gestion_accesorios.dto.adjustment.CreateAdjustmentDetailDto;
@@ -38,6 +40,27 @@ public class AdjustmentServiceImpl implements AdjustmentService {
 
     @Autowired
     private WarehouseDetailRepository warehouseDetailRepository;
+
+    @Override
+public Page<ListAdjustmentDto> paginateAll(Pageable pageable) {
+    Page<Adjustment> adjustmentsPage = adjustmentRepository.findAll(pageable);
+
+    return adjustmentsPage.map(adjustment -> {
+        int totalQuantity = adjustment.getAdjustmentDetails()
+                .stream()
+                .mapToInt(AdjustmentDetail::getQuantity)
+                .sum();
+
+        return new ListAdjustmentDto(
+                adjustment.getId(),
+                adjustment.getDate(),
+                adjustment.getType(),
+                adjustment.getDescription(),
+                totalQuantity
+        );
+    });
+}
+
 
     @Override
     public List<ListAdjustmentDto> findAll() {
@@ -82,6 +105,7 @@ public class AdjustmentServiceImpl implements AdjustmentService {
                 details);
     }
 
+    //NOTA: LOS AJUSTES LLEGAN AL ALMACEN 1 SI ES QUE AHI EXISTE EL ACCESORIO A DEVOLVER
     @Override
     @Transactional
     public Adjustment createAdjustment(CreateAdjustmentDto dto) {
@@ -133,5 +157,7 @@ public class AdjustmentServiceImpl implements AdjustmentService {
         }
         return false;
     }
+
+    
 
 }

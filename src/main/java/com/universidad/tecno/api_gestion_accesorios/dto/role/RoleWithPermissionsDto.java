@@ -5,7 +5,7 @@ import java.util.List;
 public class RoleWithPermissionsDto {
     private Long id;
     private String name;
-    private List<String> permissions;  // Cambié la lista a String para mostrar solo los nombres
+    private List<String> permissions;
 
     public RoleWithPermissionsDto(Long id, String name, List<String> permissions) {
         this.id = id;

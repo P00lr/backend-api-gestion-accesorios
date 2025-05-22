@@ -3,6 +3,9 @@ package com.universidad.tecno.api_gestion_accesorios.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,6 +27,12 @@ public class WarehouseController {
     @Autowired
     private WarehouseService warehouseService;
 
+    @GetMapping("/page/{page}")
+    public ResponseEntity<?> listPageable(@PathVariable Integer page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<Warehouse> warehouses = warehouseService.paginateAll(pageable);
+        return ResponseEntity.ok(warehouses);
+    }
     @GetMapping()
     public List<Warehouse> getWarehouses() {
         return warehouseService.findAll();

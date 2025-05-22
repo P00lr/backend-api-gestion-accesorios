@@ -9,6 +9,7 @@ public class CreateAdjustmentDto {
     private String description;
     private Long userId;
     private List<CreateAdjustmentDetailDto> adjustmentDetails;
+    
     public CreateAdjustmentDto() {
     }
     public CreateAdjustmentDto(LocalDateTime date, String type, String description, Long userId,

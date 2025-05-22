@@ -5,7 +5,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.universidad.tecno.api_gestion_accesorios.dto.accessory.AccessoryAssignmentCategoryDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.accessory.AccessoryWithCategoryDto;
@@ -29,6 +32,24 @@ public class AccessoryServiceImpl implements AccessoryService {
         return (List<Accessory>) accessoryRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public Page<AccessoryWithCategoryDto> paginarTodo(Pageable pageable) {
+        return this.accessoryRepository.findAll(pageable)
+                .map(accessory -> {
+                    AccessoryWithCategoryDto dto = new AccessoryWithCategoryDto();
+                    dto.setId(accessory.getId());
+                    dto.setName(accessory.getName());
+                    dto.setPrice(accessory.getPrice());
+                    dto.setDescription(accessory.getDescription());
+                    dto.setBrand(accessory.getBrand());
+                    dto.setModel(accessory.getModel());
+                    dto.setCategoryId(accessory.getCategory().getId());
+                    dto.setCategoryName(accessory.getCategory().getName());
+                    return dto;
+                });
+    }
+
     @Override
     public Optional<AccessoryWithCategoryDto> findById(Long id) {
 
@@ -40,6 +61,7 @@ public class AccessoryServiceImpl implements AccessoryService {
             accessoryDto.setDescription(accessory.getDescription());
             accessoryDto.setBrand(accessory.getBrand());
             accessoryDto.setModel(accessory.getModel());
+            accessoryDto.setCategoryId(accessory.getCategory().getId());
             accessoryDto.setCategoryName(accessory.getCategory().getName());
 
             return accessoryDto;
@@ -58,7 +80,7 @@ public class AccessoryServiceImpl implements AccessoryService {
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + dto.getCategoryId()));
 
         Accessory accessory = new Accessory();
-        
+
         accessory.setName(dto.getName());
         accessory.setPrice(dto.getPrice());
         accessory.setDescription(dto.getDescription());
@@ -70,25 +92,43 @@ public class AccessoryServiceImpl implements AccessoryService {
     }
 
     @Override
-    public Optional<Accessory> update(Long id, Accessory accessory) {
+    public Optional<AccessoryWithCategoryDto> update(Long id, AccessoryAssignmentCategoryDto dto) {
         return accessoryRepository.findById(id)
                 .map(existingAccessory -> {
-                    if (accessory.getName() != null) {
-                        existingAccessory.setName(accessory.getName());
+                    if (dto.getName() != null) {
+                        existingAccessory.setName(dto.getName());
                     }
-                    if (accessory.getPrice() != null) {
-                        existingAccessory.setPrice(accessory.getPrice());
+                    if (dto.getPrice() != null) {
+                        existingAccessory.setPrice(dto.getPrice());
                     }
-                    if (accessory.getDescription() != null) {
-                        existingAccessory.setDescription(accessory.getDescription());
+                    if (dto.getDescription() != null) {
+                        existingAccessory.setDescription(dto.getDescription());
                     }
-                    if (accessory.getBrand() != null) {
-                        existingAccessory.setBrand(accessory.getBrand());
+                    if (dto.getBrand() != null) {
+                        existingAccessory.setBrand(dto.getBrand());
                     }
-                    if (accessory.getModel() != null) {
-                        existingAccessory.setModel(accessory.getModel());
+                    if (dto.getModel() != null) {
+                        existingAccessory.setModel(dto.getModel());
                     }
-                    return accessoryRepository.save(existingAccessory);
+                    if (dto.getCategoryId() != null) {
+                        categoryRepository.findById(dto.getCategoryId())
+                                .ifPresent(existingAccessory::setCategory);
+                    }
+
+                    accessoryRepository.save(existingAccessory);
+
+                    // Convertimos el resultado actualizado a DTO de respuesta
+                    AccessoryWithCategoryDto responseDto = new AccessoryWithCategoryDto();
+                    responseDto.setId(existingAccessory.getId());
+                    responseDto.setName(existingAccessory.getName());
+                    responseDto.setPrice(existingAccessory.getPrice());
+                    responseDto.setDescription(existingAccessory.getDescription());
+                    responseDto.setBrand(existingAccessory.getBrand());
+                    responseDto.setModel(existingAccessory.getModel());
+                    dto.setCategoryId(existingAccessory.getCategory().getId());
+                    responseDto.setCategoryName(existingAccessory.getCategory().getName());
+
+                    return responseDto;
                 });
     }
 

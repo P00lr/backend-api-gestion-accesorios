@@ -6,6 +6,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.universidad.tecno.api_gestion_accesorios.dto.role.RolePermissionsDto;
@@ -40,8 +43,28 @@ public class RoleServiceImpl implements RoleService {
     private UserRepository userRepository;
 
     @Override
+    public Page<Role> paginateAll(Pageable pageable) {
+        return roleRepository.findAll(pageable);
+    }
+
+    @Override
     public List<Role> findAll() {
         return (List<Role>) roleRepository.findAll();
+    }
+
+    @Override
+    public Page<RoleWithPermissionsDto> paginateAllRoleWithPermissions(Pageable pageable) {
+        Page<Role> rolesPage = roleRepository.findAll(pageable);
+
+        List<RoleWithPermissionsDto> dtos = rolesPage.getContent().stream().map(role -> {
+            List<String> permissions = role.getRolePermissions().stream()
+                    .map(rp -> rp.getPermission().getName())
+                    .collect(Collectors.toList());
+
+            return new RoleWithPermissionsDto(role.getId(), role.getName(), permissions);
+        }).collect(Collectors.toList());
+
+        return new PageImpl<>(dtos, pageable, rolesPage.getTotalElements());
     }
 
     public List<RoleWithPermissionsDto> getRolesWithPermissions() {

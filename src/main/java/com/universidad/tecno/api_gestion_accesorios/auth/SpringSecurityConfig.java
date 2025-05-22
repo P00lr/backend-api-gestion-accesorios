@@ -25,7 +25,6 @@ import com.universidad.tecno.api_gestion_accesorios.auth.filter.JwtValidationFil
 
 @Configuration
 public class SpringSecurityConfig {
-
     @Autowired
     private AuthenticationConfiguration authenticationConfiguration;
 
@@ -41,28 +40,102 @@ public class SpringSecurityConfig {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
-        return http.authorizeHttpRequests(authz -> authz
-                // Rutas públicas
+        http
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configurationSource(configurationSource()))
+            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(authz -> authz
                 .requestMatchers(HttpMethod.GET, "/api/sales").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/purchases").permitAll()
+                // CLIENTS
+                .requestMatchers(HttpMethod.GET, "/api/clients/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/clients/{id}").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/clients/{id}").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/clients").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/clients/{id}").permitAll()
+
+                 // SUPPLIER
+                .requestMatchers(HttpMethod.GET, "/api/suppliers/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/suppliers/{id}").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/suppliers/{id}").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/suppliers").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/suppliers/{id}").permitAll()
+
+                // CATEGORIES
+                .requestMatchers(HttpMethod.GET, "/api/categories/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/categories/{id}").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/categories/{id}").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/categories").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/categories/{id}").permitAll()
+
+                // WAREHOUSES
+                .requestMatchers(HttpMethod.GET, "/api/warehouses/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/warehouses").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/warehouses/{id}").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/warehouses/{id}").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/warehouses").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/warehouses/{id}").permitAll()
+
+                // ACCESORIES
+                .requestMatchers(HttpMethod.GET, "/api/accessories/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/accessories/{id}").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/accessories/{id}").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/accessories").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/accessories/{id}").permitAll()
 
                 // USERS
-                // corregir los nombres de los permisos estan mal, pero todo funciona
-                .requestMatchers(HttpMethod.GET, "/api/users").hasAuthority("USERS_VIEW")
-                .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasAuthority("USER_VIEW")
-                .requestMatchers(HttpMethod.POST, "/api/users").hasAuthority("USER_CREATE")
-                .requestMatchers(HttpMethod.PUT, "/api/users/{id}").hasAuthority("USER_UPDATE")
-                .requestMatchers(HttpMethod.DELETE, "/api/users/{id}").hasAuthority("USER_DELETE")
+                
+                .requestMatchers(HttpMethod.GET, "/api/users/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/users/{id}").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/users/{id}").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/users/change-password").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/users/{id}").permitAll()
 
-                // Otros endpoints pueden agregarse igual
-                .anyRequest().authenticated())
-                .cors(cors -> cors.configurationSource(configurationSource()))
+                // SALES
+                .requestMatchers(HttpMethod.GET, "/api/sales/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/sales/{id}").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/sales").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/sales/{id}").permitAll()
+
+                // PURCHASES
+                .requestMatchers(HttpMethod.GET, "/api/purchases/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/purchases/{id}").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/purchases").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/purchases/{id}").permitAll()
+
+                // ADJUSTMENTS
+                .requestMatchers(HttpMethod.GET, "/api/adjustments/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/adjustments/{id}").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/adjustments").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/adjustments/{id}").permitAll()
+
+                // TRANSFERSS
+                .requestMatchers(HttpMethod.GET, "/api/transfers/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/transfers/{id}").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/transfers").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/transfers/{id}").permitAll()
+
+                // PERMISSIONS
+                .requestMatchers(HttpMethod.GET, "/api/permissions/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/permissions/{id}").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/permissions").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/permissions/assign-to-role").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/permissions/{id}").permitAll()
+
+                // ROLES
+                .requestMatchers(HttpMethod.GET, "/api/roles/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/roles/with-permissions/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/roles/{id}").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/roles").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/roles/{id}").permitAll()
+
+
+                        .anyRequest().authenticated())
                 .addFilter(new JwtAuthenticationFilter(authenticationManager()))
-                .addFilter(new JwtValidationFilter(authenticationManager()))
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .build();
+                .addFilter(new JwtValidationFilter(authenticationManager()));
+        return http.build();
     }
 
     @Bean
@@ -73,7 +146,6 @@ public class SpringSecurityConfig {
         config.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         config.setAllowCredentials(true);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;

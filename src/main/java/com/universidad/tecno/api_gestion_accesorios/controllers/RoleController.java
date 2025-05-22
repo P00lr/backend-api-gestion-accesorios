@@ -3,6 +3,9 @@ package com.universidad.tecno.api_gestion_accesorios.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,9 +33,23 @@ public class RoleController {
     @Autowired
     private UserService userService;
 
+    @GetMapping("/page/{page}")
+    public ResponseEntity<?> listPageable(@PathVariable Integer page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<Role> roles = roleService.paginateAll(pageable);
+        return ResponseEntity.ok(roles);
+    }
+
     @GetMapping
     public List<Role> getRoles() {
         return roleService.findAll();
+    }
+
+    @GetMapping("/with-permissions/page/{page}")
+    public ResponseEntity<Page<RoleWithPermissionsDto>> listarRolesConPermisos(@PathVariable int page) {
+        Pageable pageable = PageRequest.of(page, 3); // Usa el mismo tamaño de página que tus otros recursos
+        Page<RoleWithPermissionsDto> rolesConPermisos = roleService.paginateAllRoleWithPermissions(pageable);
+        return ResponseEntity.ok(rolesConPermisos);
     }
 
     @GetMapping("/with-permissions")

@@ -1,8 +1,9 @@
 package com.universidad.tecno.api_gestion_accesorios.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,15 +27,11 @@ public class AccessoryController {
     @Autowired
     private AccessoryService accessoryService;
 
-    /* @GetMapping
-    public List<Accessory> getAccessories() {
-        return accessoryService.findAll();
-    } */
-
-    @GetMapping
-    public ResponseEntity<List<AccessoryWithCategoryDto>> getAccessoriesWithCategory() {
-        List<AccessoryWithCategoryDto> accessories = accessoryService.getAccessoryWithCategoryDtos();
-        return ResponseEntity.ok(accessories);
+    @GetMapping("/page/{page}")
+    public ResponseEntity<Page<AccessoryWithCategoryDto>> listarPaginado(@PathVariable int page) {
+        Pageable pageable = PageRequest.of(page, 7);
+        Page<AccessoryWithCategoryDto> accesorios = accessoryService.paginarTodo(pageable);
+        return ResponseEntity.ok(accesorios);
     }
 
     @GetMapping("/{id}")
@@ -44,22 +41,28 @@ public class AccessoryController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    /* @PostMapping
-    public ResponseEntity<Accessory> createAccessory(@RequestBody Accessory accessory) {
-        Accessory newAccessory = accessoryService.save(accessory);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newAccessory);
-    } */
+    /*
+     * @PostMapping
+     * public ResponseEntity<Accessory> createAccessory(@RequestBody Accessory
+     * accessory) {
+     * Accessory newAccessory = accessoryService.save(accessory);
+     * return ResponseEntity.status(HttpStatus.CREATED).body(newAccessory);
+     * }
+     */
 
-    @PostMapping    
+    @PostMapping
     public ResponseEntity<Accessory> createAccessory(@RequestBody AccessoryAssignmentCategoryDto dto) {
         Accessory accessory = accessoryService.saveDto(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(accessory);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Accessory> updateAccessory(@PathVariable Long id, @RequestBody Accessory accessory) {
-        return accessoryService.update(id, accessory)
-                .map(existingAccessory -> ResponseEntity.ok(existingAccessory))
+    public ResponseEntity<AccessoryWithCategoryDto> updateAccessory(
+            @PathVariable Long id,
+            @RequestBody AccessoryAssignmentCategoryDto dto) {
+
+        return accessoryService.update(id, dto)
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

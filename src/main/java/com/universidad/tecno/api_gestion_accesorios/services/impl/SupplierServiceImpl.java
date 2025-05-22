@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.universidad.tecno.api_gestion_accesorios.entities.Supplier;
@@ -16,6 +18,11 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Autowired
     private SupplierRepository supplierRepository;
+
+    @Override
+    public Page<Supplier> paginateAll(Pageable pageable) {
+        return supplierRepository.findAll(pageable);
+    }
 
     @Override
     public List<Supplier> findAll() {
@@ -59,6 +66,8 @@ public class SupplierServiceImpl implements SupplierService {
         }
         return false;
     }
+
+    
 
 
 }

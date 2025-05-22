@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.universidad.tecno.api_gestion_accesorios.entities.Permission;
@@ -30,6 +32,11 @@ public class PermissionsServiceImpl implements PermissionService{
 
     @Autowired
     private RoleRepository roleRepository;
+
+     @Override
+    public Page<Permission> paginateAll(Pageable pageable) {
+        return permissionRepository.findAll(pageable);
+    }
 
     @Override
     public List<Permission> findAll() {
@@ -98,5 +105,9 @@ public class PermissionsServiceImpl implements PermissionService{
             }
         }
     }
+
+    
+
+   
 
 }

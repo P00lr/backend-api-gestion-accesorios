@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,10 +29,12 @@ public class SaleController {
     @Autowired
     private SaleService saleService;
 
-    /* @GetMapping
-    public List<Sale> getSales() {
-        return saleService.findAll();
-    } */
+    @GetMapping("/page/{page}")
+    public ResponseEntity<Page<ListSaleDto>> listSalesPageable(@PathVariable Integer page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<ListSaleDto> saleDtos = saleService.paginateAll(pageable);
+        return ResponseEntity.ok(saleDtos);
+    }
 
     @GetMapping
     public ResponseEntity<List<ListSaleDto>> getAllSales() {
@@ -53,16 +58,16 @@ public class SaleController {
     public ResponseEntity<String> createSale(@RequestBody CreateSaleDto createSaleDto) {
         try {
             saleService.createSale(createSaleDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Venta realizada correctamente");
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (RuntimeException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error en la venta");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteSale(@PathVariable Long id) {
-        
+
         boolean deteledSale = saleService.deleteById(id);
 
         if (deteledSale) {
