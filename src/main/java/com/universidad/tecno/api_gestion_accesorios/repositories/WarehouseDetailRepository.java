@@ -30,4 +30,5 @@ public interface WarehouseDetailRepository extends CrudRepository<WarehouseDetai
     @Query("SELECT SUM(wd.stock) FROM WarehouseDetail wd WHERE wd.accessory.id = :accessoryId AND wd.state = :state")
     Integer sumStockByAccessoryIdAndState(@Param("accessoryId") Long accessoryId, @Param("state") String state);
 
+
 }

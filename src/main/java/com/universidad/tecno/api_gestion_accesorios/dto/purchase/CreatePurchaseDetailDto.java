@@ -1,23 +1,15 @@
 package com.universidad.tecno.api_gestion_accesorios.dto.purchase;
 
 public class CreatePurchaseDetailDto {
-    private Long warehouseDetailId;
+    private Long accessoryId;
     private Integer quantityType;
 
     public CreatePurchaseDetailDto() {
     }
 
-    public CreatePurchaseDetailDto(Long warehouseDetailId, Integer quantityType) {
-        this.warehouseDetailId = warehouseDetailId;
+    public CreatePurchaseDetailDto(Long accessoryId, Integer quantityType) {
+        this.accessoryId = accessoryId;
         this.quantityType = quantityType;
-    }
-
-    public Long getWarehouseDetailId() {
-        return warehouseDetailId;
-    }
-
-    public void setWarehouseDetailId(Long warehouseDetailId) {
-        this.warehouseDetailId = warehouseDetailId;
     }
 
     public Integer getQuantityType() {
@@ -26,6 +18,14 @@ public class CreatePurchaseDetailDto {
 
     public void setQuantityType(Integer quantityType) {
         this.quantityType = quantityType;
+    }
+
+    public Long getAccessoryId() {
+        return accessoryId;
+    }
+
+    public void setAccessoryId(Long accessoryId) {
+        this.accessoryId = accessoryId;
     }
     
     

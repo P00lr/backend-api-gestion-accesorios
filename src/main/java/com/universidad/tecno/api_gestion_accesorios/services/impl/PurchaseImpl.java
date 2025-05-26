@@ -16,15 +16,19 @@ import com.universidad.tecno.api_gestion_accesorios.dto.purchase.CreatePurchaseD
 import com.universidad.tecno.api_gestion_accesorios.dto.purchase.GetPurchaseDetailDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.purchase.GetPurchaseDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.purchase.ListPurchaseDto;
+import com.universidad.tecno.api_gestion_accesorios.entities.Accessory;
 import com.universidad.tecno.api_gestion_accesorios.entities.Purchase;
 import com.universidad.tecno.api_gestion_accesorios.entities.PurchaseDetail;
 import com.universidad.tecno.api_gestion_accesorios.entities.Supplier;
 import com.universidad.tecno.api_gestion_accesorios.entities.User;
+import com.universidad.tecno.api_gestion_accesorios.entities.Warehouse;
 import com.universidad.tecno.api_gestion_accesorios.entities.WarehouseDetail;
+import com.universidad.tecno.api_gestion_accesorios.repositories.AccessoryRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.PurchaseRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.SupplierRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.UserRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.WarehouseDetailRepository;
+import com.universidad.tecno.api_gestion_accesorios.repositories.WarehouseRepository;
 import com.universidad.tecno.api_gestion_accesorios.services.interfaces.PurchaseService;
 
 import jakarta.transaction.Transactional;
@@ -43,6 +47,12 @@ public class PurchaseImpl implements PurchaseService {
 
     @Autowired
     private WarehouseDetailRepository warehouseDetailRepository;
+
+    @Autowired
+    private WarehouseRepository warehouseRepository;
+
+    @Autowired
+    private AccessoryRepository accessoryRepository;
 
     @Override
     public Page<ListPurchaseDto> paginateAll(Pageable pageable) {
@@ -111,7 +121,8 @@ public class PurchaseImpl implements PurchaseService {
     @Override
     @Transactional
     public Purchase createPurchase(CreatePurchaseDto purchaseDto) {
-        // Validar proveedor
+        System.out.println("Creando compra con datos: " + purchaseDto);
+
         if (purchaseDto.getSupplierId() == null) {
             throw new IllegalArgumentException("El ID del proveedor no puede ser nulo");
         }
@@ -120,7 +131,6 @@ public class PurchaseImpl implements PurchaseService {
                 .orElseThrow(() -> new RuntimeException(
                         "No se encontró al Proveedor con ID: " + purchaseDto.getSupplierId()));
 
-        // Validar usuario
         if (purchaseDto.getUserId() == null) {
             throw new IllegalArgumentException("El ID del usuario no puede ser nulo");
         }
@@ -128,6 +138,14 @@ public class PurchaseImpl implements PurchaseService {
         User user = userRepository.findById(purchaseDto.getUserId())
                 .orElseThrow(
                         () -> new RuntimeException("No se encontró al Usuario con ID: " + purchaseDto.getUserId()));
+
+        if (purchaseDto.getWarehouseId() == null) {
+            throw new IllegalArgumentException("El ID del almacén no puede ser nulo");
+        }
+
+        Warehouse targetWarehouse = warehouseRepository.findById(purchaseDto.getWarehouseId())
+                .orElseThrow(() -> new RuntimeException(
+                        "No se encontró el Almacén con ID: " + purchaseDto.getWarehouseId()));
 
         Purchase purchase = new Purchase();
         purchase.setPurchaseDate(LocalDateTime.now());
@@ -139,28 +157,37 @@ public class PurchaseImpl implements PurchaseService {
         int totalQuantity = 0;
 
         for (CreatePurchaseDetailDto detailDto : purchaseDto.getPurchaseDetails()) {
-            Long warehouseDetailId = detailDto.getWarehouseDetailId();
-            if (warehouseDetailId == null) {
-                throw new IllegalArgumentException("El ID de warehouseDetail no puede ser nulo");
+            Long accessoryId = detailDto.getAccessoryId();
+            int quantity = detailDto.getQuantityType();
+
+            Accessory accessory = accessoryRepository.findById(accessoryId)
+                    .orElseThrow(() -> new RuntimeException("No se encontró Accessory con ID: " + accessoryId));
+
+            // Buscar o crear el WarehouseDetail para ese accessory en el warehouse destino
+            WarehouseDetail targetDetail = warehouseDetailRepository
+                    .findByAccessoryIdAndWarehouseId(accessoryId, targetWarehouse.getId())
+                    .orElse(null);
+
+            if (targetDetail == null) {
+                targetDetail = new WarehouseDetail();
+                targetDetail.setAccessory(accessory);
+                targetDetail.setWarehouse(targetWarehouse);
+                targetDetail.setStock(quantity); // stock inicial
+                targetDetail.setState("AVAILABLE");
+            } else {
+                targetDetail.setStock(targetDetail.getStock() + quantity); // acumular stock
             }
 
-            WarehouseDetail warehouseDetail = warehouseDetailRepository.findById(warehouseDetailId)
-                    .orElseThrow(
-                            () -> new RuntimeException("No se encontró WarehouseDetail con ID: " + warehouseDetailId));
+            warehouseDetailRepository.save(targetDetail);
 
-            int quantity = detailDto.getQuantityType();
-            double amount = quantity * warehouseDetail.getAccessory().getPrice();
+            PurchaseDetail purchaseDetail = new PurchaseDetail();
+            purchaseDetail.setWarehouseDetail(targetDetail);
+            purchaseDetail.setQuantityType(quantity);
+            double amount = quantity * accessory.getPrice();
+            purchaseDetail.setAmountType(amount);
+            purchaseDetail.setPurchase(purchase);
 
-            PurchaseDetail detail = new PurchaseDetail();
-            detail.setWarehouseDetail(warehouseDetail);
-            detail.setQuantityType(quantity);
-            detail.setAmountType(amount);
-            detail.setPurchase(purchase);
-
-            // Actualizar stock
-            warehouseDetail.setStock(warehouseDetail.getStock() + quantity);
-
-            purchaseDetails.add(detail);
+            purchaseDetails.add(purchaseDetail);
             totalAmount += amount;
             totalQuantity += quantity;
         }

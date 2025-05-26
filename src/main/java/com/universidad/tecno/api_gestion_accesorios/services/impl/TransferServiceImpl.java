@@ -103,6 +103,8 @@ public class TransferServiceImpl implements TransferService {
         }
 
         Transfer transfer = new Transfer();
+        System.out.println("transfers guardada con ID despues de crearla: " + transfer.getId());
+
         transfer.setDate(LocalDateTime.now());
         transfer.setDescription(dto.getDescription());
         transfer.setUser(user);
@@ -122,26 +124,28 @@ public class TransferServiceImpl implements TransferService {
 
             // Actualizar stock del almacén de origen
             originDetail.setStock(originDetail.getStock() - detailDto.getQuantity());
+            warehouseDetailRepository.save(originDetail);
 
             // Obtener o crear el detalle del almacén de destino para ese accesorio
             WarehouseDetail destinationDetail = warehouseDetailRepository
                     .findByAccessoryIdAndWarehouseId(originDetail.getAccessory().getId(), destination.getId())
-                    .orElseGet(() -> {
-                        WarehouseDetail newDetail = new WarehouseDetail();
-                        newDetail.setAccessory(originDetail.getAccessory());
-                        newDetail.setWarehouse(destination);
-                        newDetail.setStock(0);
-                        newDetail.setState("Activo");
-                        return newDetail;
-                    });
+                    .orElse(null);
 
-            destinationDetail.setStock(destinationDetail.getStock() + detailDto.getQuantity());
+            if (destinationDetail == null) {
+                destinationDetail = new WarehouseDetail();
+                destinationDetail.setAccessory(originDetail.getAccessory());
+                destinationDetail.setWarehouse(destination);
+                destinationDetail.setStock(detailDto.getQuantity()); // Se asigna directamente la cantidad transferida
+                destinationDetail.setState("AVAILABLE");
+            } else {
+                destinationDetail.setStock(destinationDetail.getStock() + detailDto.getQuantity());
+            }
 
             warehouseDetailRepository.save(destinationDetail);
 
             TransferDetail transferDetail = new TransferDetail();
             transferDetail.setTransfer(transfer);
-            transferDetail.setWarehouseDetail(originDetail);
+            transferDetail.setWarehouseDetail(originDetail); // Se relaciona el detalle del origen
             transferDetail.setQuantity(detailDto.getQuantity());
 
             detailList.add(transferDetail);
@@ -149,7 +153,11 @@ public class TransferServiceImpl implements TransferService {
 
         transfer.setTransferDetails(detailList);
 
+        System.out.println("transfers guardada con ID despues de crearla: " + transfer.getId());
+        
         return transferRepository.save(transfer);
+
+
     }
 
     @Override
