@@ -8,14 +8,18 @@ import org.springframework.data.domain.Pageable;
 
 import com.universidad.tecno.api_gestion_accesorios.dto.accessory.AccessoryAssignmentCategoryDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.accessory.AccessoryWithCategoryDto;
+import com.universidad.tecno.api_gestion_accesorios.dto.accessory.GetAccessories;
 import com.universidad.tecno.api_gestion_accesorios.entities.Accessory;
 
 public interface AccessoryService {
+
+    public Page<GetAccessories> paginateAccessoriesCatalog(Pageable pageable);
+
     List<Accessory> findAll();
 
-    Page<AccessoryWithCategoryDto> paginarTodo(Pageable pageable);
+    Page<AccessoryWithCategoryDto> paginateAll(Pageable pageable);
 
-    Optional<AccessoryWithCategoryDto> findById(Long id); // muestra con dto
+    Optional<AccessoryWithCategoryDto> findById(Long id);
 
     Accessory save(Accessory accessory);
 

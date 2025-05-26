@@ -108,7 +108,6 @@ public class PurchaseImpl implements PurchaseService {
         });
     }
 
-    // NOTA: AL COMPRAR SE PUEDE AGREGAR LA CANTIDAD A CUALQUIER ALMACEN EXISTENTE
     @Override
     @Transactional
     public Purchase createPurchase(CreatePurchaseDto purchaseDto) {

@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +27,6 @@ import com.universidad.tecno.api_gestion_accesorios.entities.User;
 import com.universidad.tecno.api_gestion_accesorios.entities.WarehouseDetail;
 import com.universidad.tecno.api_gestion_accesorios.repositories.AccessoryRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.ClientRepository;
-import com.universidad.tecno.api_gestion_accesorios.repositories.SaleDetailRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.SaleRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.UserRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.WarehouseDetailRepository;
@@ -37,9 +39,6 @@ public class SaleServiceImpl implements SaleService {
 
     @Autowired
     private SaleRepository saleRepository;
-
-    @Autowired
-    private SaleDetailRepository saleDetailRepository;
 
     @Autowired
     private WarehouseDetailRepository warehouseDetailRepository;
@@ -117,7 +116,7 @@ public class SaleServiceImpl implements SaleService {
             GetSaleDetailDto saleDetailDto = new GetSaleDetailDto();
             saleDetailDto.setAccessoryId(accessory.getId());
             saleDetailDto.setAccessoryName(accessory.getName());
-            saleDetailDto.setQuantityType(saleDetail.getQuantityType());
+            saleDetailDto.setQuantityType(saleDetail.getQuantity());
             saleDetailDto.setAmountType(saleDetail.getAmountType());
             saleDetailDto.setPrice(accessory.getPrice());
 
@@ -138,71 +137,74 @@ public class SaleServiceImpl implements SaleService {
         return Optional.of(saleDto); // Devolver el SaleDto envuelto en Optional
     }
 
-    //NOTA: LA EL ACCESORIO TIENE QUE ESTAR OBLLIGATORIAMENTE EN EL ALMACEN 1 PARA LA VENTA
     @Transactional
-    public Sale createSale(CreateSaleDto saleDto) {
-        // Obtener cliente y usuario
-        Client client = clientRepository.findById(saleDto.getClientId())
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
-        User user = userRepository.findById(saleDto.getUserId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    public void processSale(CreateSaleDto dto) {
 
-        // Crear la venta
+        double totalAmount = 0.0;
+        int totalQuantity = 0;
+
         Sale sale = new Sale();
-        sale.setClient(client);
-        sale.setUser(user);
+        sale.setClient(clientRepository.findById(dto.getClientId())
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado")));
+        sale.setUser(userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado")));
         sale.setSaleDate(LocalDateTime.now());
 
-        // Guardar la venta
-        sale = saleRepository.save(sale);
-
-        // Lista de detalles de venta
         List<SaleDetail> saleDetails = new ArrayList<>();
-        Double totalAmount = 0.0;
-        Integer totalQuantity = 0;
 
-        // Procesar los detalles de la venta
-        for (CreateSaleDetailDto saleDetailDto : saleDto.getSaleDetails()) {
-            Accessory accessory = accessoryRepository.findById(saleDetailDto.getAccessoryId())
-                    .orElseThrow(() -> new RuntimeException("Accesorio no encontrado"));
+        for (CreateSaleDetailDto item : dto.getSaleDetails()) {
+            Long accessoryId = item.getAccessoryId();
+            int quantity = item.getQuantity();
 
-            // Obtener el detalle de inventario del almacén con ID 1
-            WarehouseDetail warehouseDetail = warehouseDetailRepository
-                    .findByWarehouseIdAndAccessoryId(1L, accessory.getId())
-                    .orElseThrow(() -> new RuntimeException("Inventario no encontrado para el accesorio"));
+            // Obtener los almacenes con stock disponible
+            List<WarehouseDetail> warehouseDetails = warehouseDetailRepository
+                    .findByAccessoryIdAndStockGreaterThanAndStateOrderByStockDesc(
+                            accessoryId, 0, "AVAILABLE");
 
-            // Verificar stock suficiente
-            if (warehouseDetail.getStock() < saleDetailDto.getQuantityType()) {
-                throw new RuntimeException("Stock insuficiente");
+            int remaining = quantity;
+
+            for (WarehouseDetail detail : warehouseDetails) {
+                if (remaining <= 0)
+                    break;
+
+                int available = detail.getStock();
+                int toTake = Math.min(available, remaining);
+
+                // Crear el detalle de venta
+                SaleDetail saleDetail = new SaleDetail();
+                saleDetail.setWarehouseDetail(detail); // aquí se setea correctamente
+                saleDetail.setQuantity(toTake);
+                saleDetail.setAmountType(detail.getAccessory().getPrice() * toTake); // calculas el subtotal
+                saleDetail.setSale(sale);
+
+                saleDetails.add(saleDetail);
+
+                // Actualizar stock
+                detail.setStock(available - toTake);
+                warehouseDetailRepository.save(detail);
+
+                remaining -= toTake;
             }
 
-            // Actualizar stock en el inventario
-            warehouseDetail.setStock(warehouseDetail.getStock() - saleDetailDto.getQuantityType());
-            warehouseDetailRepository.save(warehouseDetail);
-
-            // Calcular el monto total por producto (amountType = precio * cantidad)
-            Double amountType = accessory.getPrice() * saleDetailDto.getQuantityType();
-            totalAmount += amountType;
-            totalQuantity += saleDetailDto.getQuantityType();
-
-            // Crear y guardar el detalle de la venta
-            SaleDetail saleDetail = new SaleDetail();
-            saleDetail.setSale(sale);
-            saleDetail.setWarehouseDetail(warehouseDetail);
-            saleDetail.setAmountType(amountType);
-            saleDetail.setQuantityType(saleDetailDto.getQuantityType());
-            saleDetails.add(saleDetail);
+            if (remaining > 0) {
+                throw new RuntimeException("Stock insuficiente para el accesorio con ID: " + accessoryId);
+            }
+        }
+        for (SaleDetail detail : saleDetails) {
+            totalAmount += detail.getAmountType(); // amountType ya es precio * cantidad
+            totalQuantity += detail.getQuantity();
         }
 
-        // Guardar todos los detalles de la venta
-        saleDetailRepository.saveAll(saleDetails);
+        //solo redondeo a 2 decimales
+        BigDecimal totalRounded = BigDecimal.valueOf(totalAmount).setScale(2, RoundingMode.HALF_UP);
+        sale.setTotalAmount(totalRounded.doubleValue());
 
-        // Actualizar el total de la venta
-        sale.setTotalAmount(totalAmount);
+        //sale.setTotalAmount(totalAmount);
         sale.setTotalQuantity(totalQuantity);
-        saleRepository.save(sale);
+        sale.setSaleDetails(saleDetails);
+        saleRepository.save(sale); // Cascade puede guardar saleDetails también
 
-        return sale;
+        // Opcional: devolver ID o resumen
     }
 
     @Override

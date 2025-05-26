@@ -8,7 +8,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.universidad.tecno.api_gestion_accesorios.dto.warehouse.GetWarehouseDetail;
 import com.universidad.tecno.api_gestion_accesorios.entities.Warehouse;
+import com.universidad.tecno.api_gestion_accesorios.entities.WarehouseDetail;
+import com.universidad.tecno.api_gestion_accesorios.repositories.WarehouseDetailRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.WarehouseRepository;
 import com.universidad.tecno.api_gestion_accesorios.services.interfaces.WarehouseService;
 
@@ -17,6 +20,9 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Autowired
     private WarehouseRepository warehouseRepository;
+
+    @Autowired
+    private WarehouseDetailRepository warehouseDetailRepository;
 
     @Override
     public Page<Warehouse> paginateAll(Pageable pageable) {
@@ -58,6 +64,24 @@ public class WarehouseServiceImpl implements WarehouseService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<GetWarehouseDetail> findAllWarehouseDetail() {
+        List<WarehouseDetail> warehouseDetail = (List<WarehouseDetail>) warehouseDetailRepository.findAll();
+
+        return warehouseDetail.stream().map( wd -> {
+            GetWarehouseDetail dto = new GetWarehouseDetail();
+            dto.setId(wd.getId());
+            dto.setAccessoryId(wd.getAccessory().getId());
+            dto.setAccessoryName(wd.getAccessory().getName());
+            dto.setWarehouseId(wd.getWarehouse().getId());
+            dto.setWarehouseName(wd.getWarehouse().getName());
+            dto.setStock(wd.getStock());
+            dto.setState(wd.getState());
+
+            return dto;
+        }).toList();
     }
 
     

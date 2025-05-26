@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.universidad.tecno.api_gestion_accesorios.dto.warehouse.GetWarehouseDetail;
 import com.universidad.tecno.api_gestion_accesorios.entities.Warehouse;
 import com.universidad.tecno.api_gestion_accesorios.services.interfaces.WarehouseService;
 
@@ -36,6 +37,11 @@ public class WarehouseController {
     @GetMapping()
     public List<Warehouse> getWarehouses() {
         return warehouseService.findAll();
+    }
+
+    @GetMapping("/details")
+    public List<GetWarehouseDetail> getWarehouseDetails() {
+        return warehouseService.findAllWarehouseDetail();
     }
 
     @GetMapping("/{id}")

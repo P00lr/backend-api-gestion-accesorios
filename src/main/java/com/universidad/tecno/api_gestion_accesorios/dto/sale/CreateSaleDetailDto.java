@@ -3,26 +3,31 @@ package com.universidad.tecno.api_gestion_accesorios.dto.sale;
 public class CreateSaleDetailDto {
 
     private Long accessoryId;
-    private Integer quantityType;
+    private Integer quantity;
 
     public CreateSaleDetailDto() {
     }
-    public CreateSaleDetailDto(Long accessoryId, Integer quantityType) {
+    
+    public CreateSaleDetailDto(Long accessoryId, Integer quantity) {
         this.accessoryId = accessoryId;
-        this.quantityType = quantityType;
+        this.quantity = quantity;
     }
+
     public Long getAccessoryId() {
         return accessoryId;
     }
     public void setAccessoryId(Long accessoryId) {
         this.accessoryId = accessoryId;
     }
-    public Integer getQuantityType() {
-        return quantityType;
+
+    public Integer getQuantity() {
+        return quantity;
     }
-    public void setQuantityType(Integer quantityType) {
-        this.quantityType = quantityType;
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
+    
 
     
 }

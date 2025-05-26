@@ -55,12 +55,13 @@ public class SaleController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createSale(@RequestBody CreateSaleDto createSaleDto) {
+    public ResponseEntity<?> createSale(@RequestBody CreateSaleDto createSaleDto) {
         try {
-            saleService.createSale(createSaleDto);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            saleService.processSale(createSaleDto); // renombrado al nuevo método
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .build();
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .build();
         }
     }

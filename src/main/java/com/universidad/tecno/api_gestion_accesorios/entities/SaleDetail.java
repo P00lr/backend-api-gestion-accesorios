@@ -20,7 +20,7 @@ public class SaleDetail {
     private Long id;
 
     private Double amountType;
-    private Integer quantityType;
+    private Integer quantity;
 
     @ManyToOne
     @JoinColumn(name = "sale_id", nullable = false)
@@ -33,13 +33,17 @@ public class SaleDetail {
     public SaleDetail() {
     }
 
-    public SaleDetail(Long id, Double amountType, Integer quantityType, Sale sale, WarehouseDetail warehouseDetail) {
+    
+
+    public SaleDetail(Long id, Double amountType, Integer quantity, Sale sale, WarehouseDetail warehouseDetail) {
         this.id = id;
         this.amountType = amountType;
-        this.quantityType = quantityType;
+        this.quantity = quantity;
         this.sale = sale;
         this.warehouseDetail = warehouseDetail;
     }
+
+
 
     public Long getId() {
         return id;
@@ -47,14 +51,6 @@ public class SaleDetail {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Integer getQuantityType() {
-        return quantityType;
-    }
-
-    public void setQuantityType(Integer quantityType) {
-        this.quantityType = quantityType;
     }
 
     public Double getAmountType() {
@@ -79,6 +75,18 @@ public class SaleDetail {
 
     public void setWarehouseDetail(WarehouseDetail warehouseDetail) {
         this.warehouseDetail = warehouseDetail;
+    }
+
+
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
 }

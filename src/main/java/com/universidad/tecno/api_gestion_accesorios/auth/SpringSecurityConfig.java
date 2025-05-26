@@ -72,6 +72,7 @@ public class SpringSecurityConfig {
                 // WAREHOUSES
                 .requestMatchers(HttpMethod.GET, "/api/warehouses/page/{page}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/warehouses").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/warehouses/details").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/warehouses/{id}").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/warehouses/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/warehouses").permitAll()
@@ -79,6 +80,7 @@ public class SpringSecurityConfig {
 
                 // ACCESORIES
                 .requestMatchers(HttpMethod.GET, "/api/accessories/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/accessories/page/catalog/{page}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/accessories/{id}").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/accessories/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/accessories").permitAll()

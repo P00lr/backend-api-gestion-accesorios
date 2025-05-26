@@ -12,10 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.universidad.tecno.api_gestion_accesorios.dto.accessory.AccessoryAssignmentCategoryDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.accessory.AccessoryWithCategoryDto;
+import com.universidad.tecno.api_gestion_accesorios.dto.accessory.GetAccessories;
 import com.universidad.tecno.api_gestion_accesorios.entities.Accessory;
 import com.universidad.tecno.api_gestion_accesorios.entities.Category;
 import com.universidad.tecno.api_gestion_accesorios.repositories.AccessoryRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.CategoryRepository;
+import com.universidad.tecno.api_gestion_accesorios.repositories.WarehouseDetailRepository;
 import com.universidad.tecno.api_gestion_accesorios.services.interfaces.AccessoryService;
 
 @Service
@@ -27,6 +29,32 @@ public class AccessoryServiceImpl implements AccessoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private WarehouseDetailRepository warehouseDetailRepository;
+
+    // catalogo paginado solo para el client
+    @Transactional(readOnly = true)
+    @Override
+    public Page<GetAccessories> paginateAccessoriesCatalog(Pageable pageable) {
+        return this.accessoryRepository.findAllWithAvailableStock(pageable)
+                .map(accessory -> {
+                    Integer totalStock = warehouseDetailRepository
+                            .sumStockByAccessoryIdAndState(accessory.getId(), "AVAILABLE");
+
+                    GetAccessories dto = new GetAccessories();
+                    dto.setId(accessory.getId());
+                    dto.setName(accessory.getName());
+                    dto.setDescription(accessory.getDescription());
+                    dto.setPrice(accessory.getPrice());
+                    dto.setStock(totalStock != null ? totalStock : 0);
+                    dto.setAvailable(true); // Ya sabemos que tiene stock
+                    dto.setCategoryId(accessory.getCategory().getId());
+                    dto.setCategoryName(accessory.getCategory().getName());
+
+                    return dto;
+                });
+    }
+
     @Override
     public List<Accessory> findAll() {
         return (List<Accessory>) accessoryRepository.findAll();
@@ -34,7 +62,7 @@ public class AccessoryServiceImpl implements AccessoryService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<AccessoryWithCategoryDto> paginarTodo(Pageable pageable) {
+    public Page<AccessoryWithCategoryDto> paginateAll(Pageable pageable) {
         return this.accessoryRepository.findAll(pageable)
                 .map(accessory -> {
                     AccessoryWithCategoryDto dto = new AccessoryWithCategoryDto();

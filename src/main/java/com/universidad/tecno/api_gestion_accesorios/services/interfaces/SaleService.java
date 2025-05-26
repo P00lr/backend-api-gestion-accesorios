@@ -16,6 +16,6 @@ public interface SaleService {
     List<Sale> findAll();
     List<ListSaleDto> getAllSales();
     Optional<GetSaleDto> getSaleById(Long id);
-    public Sale createSale(CreateSaleDto saleDto);
+    public void processSale(CreateSaleDto dto);
     boolean deleteById(Long id);
 }
