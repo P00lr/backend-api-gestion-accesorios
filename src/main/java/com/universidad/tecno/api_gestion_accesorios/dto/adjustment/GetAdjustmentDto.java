@@ -9,23 +9,23 @@ public class GetAdjustmentDto {
     private String type;
     private String description;
     private String userFullName;
+    private String warehouseName;
     private List<GetAdjustmentDetailDto> details;
 
     
     public GetAdjustmentDto() {
     }
 
-
     public GetAdjustmentDto(Long id, LocalDateTime date, String type, String description, String userFullName,
-            List<GetAdjustmentDetailDto> details) {
+            String warehouseName, List<GetAdjustmentDetailDto> details) {
         this.id = id;
         this.date = date;
         this.type = type;
         this.description = description;
         this.userFullName = userFullName;
+        this.warehouseName = warehouseName;
         this.details = details;
     }
-
 
     public Long getId() {
         return id;
@@ -84,6 +84,14 @@ public class GetAdjustmentDto {
 
     public void setDetails(List<GetAdjustmentDetailDto> details) {
         this.details = details;
+    }
+
+    public String getWarehouseName() {
+        return warehouseName;
+    }
+
+    public void setWarehouseName(String warehouseName) {
+        this.warehouseName = warehouseName;
     }
 
     

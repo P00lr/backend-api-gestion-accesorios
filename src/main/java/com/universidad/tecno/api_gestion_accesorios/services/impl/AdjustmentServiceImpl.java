@@ -14,14 +14,18 @@ import com.universidad.tecno.api_gestion_accesorios.dto.adjustment.CreateAdjustm
 import com.universidad.tecno.api_gestion_accesorios.dto.adjustment.GetAdjustmentDetailDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.adjustment.GetAdjustmentDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.adjustment.ListAdjustmentDto;
+import com.universidad.tecno.api_gestion_accesorios.entities.Accessory;
 import com.universidad.tecno.api_gestion_accesorios.entities.Adjustment;
 import com.universidad.tecno.api_gestion_accesorios.entities.AdjustmentDetail;
 import com.universidad.tecno.api_gestion_accesorios.entities.User;
+import com.universidad.tecno.api_gestion_accesorios.entities.Warehouse;
 import com.universidad.tecno.api_gestion_accesorios.entities.WarehouseDetail;
+import com.universidad.tecno.api_gestion_accesorios.repositories.AccessoryRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.AdjustmentDetailRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.AdjustmentRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.UserRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.WarehouseDetailRepository;
+import com.universidad.tecno.api_gestion_accesorios.repositories.WarehouseRepository;
 import com.universidad.tecno.api_gestion_accesorios.services.interfaces.AdjustmentService;
 
 import jakarta.transaction.Transactional;
@@ -41,26 +45,30 @@ public class AdjustmentServiceImpl implements AdjustmentService {
     @Autowired
     private WarehouseDetailRepository warehouseDetailRepository;
 
+    @Autowired
+    private WarehouseRepository warehouseRepository;
+
+    @Autowired
+    private AccessoryRepository accessoryRepository;
+
     @Override
-public Page<ListAdjustmentDto> paginateAll(Pageable pageable) {
-    Page<Adjustment> adjustmentsPage = adjustmentRepository.findAll(pageable);
+    public Page<ListAdjustmentDto> paginateAll(Pageable pageable) {
+        Page<Adjustment> adjustmentsPage = adjustmentRepository.findAll(pageable);
 
-    return adjustmentsPage.map(adjustment -> {
-        int totalQuantity = adjustment.getAdjustmentDetails()
-                .stream()
-                .mapToInt(AdjustmentDetail::getQuantity)
-                .sum();
+        return adjustmentsPage.map(adjustment -> {
+            int totalQuantity = adjustment.getAdjustmentDetails()
+                    .stream()
+                    .mapToInt(AdjustmentDetail::getQuantity)
+                    .sum();
 
-        return new ListAdjustmentDto(
-                adjustment.getId(),
-                adjustment.getDate(),
-                adjustment.getType(),
-                adjustment.getDescription(),
-                totalQuantity
-        );
-    });
-}
-
+            return new ListAdjustmentDto(
+                    adjustment.getId(),
+                    adjustment.getDate(),
+                    adjustment.getType(),
+                    adjustment.getDescription(),
+                    totalQuantity);
+        });
+    }
 
     @Override
     public List<ListAdjustmentDto> findAll() {
@@ -84,17 +92,21 @@ public Page<ListAdjustmentDto> paginateAll(Pageable pageable) {
     @Override
     public GetAdjustmentDto getAdjustmentById(Long id) {
         Adjustment adjustment = adjustmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Adjustment not found"));
+                .orElseThrow(() -> new RuntimeException("Ajuste no encontrado"));
 
         List<GetAdjustmentDetailDto> details = adjustment.getAdjustmentDetails().stream()
                 .map(detail -> new GetAdjustmentDetailDto(
-                        detail.getWarehouseDetail().getId(),
                         detail.getWarehouseDetail().getAccessory().getName(),
-                        detail.getWarehouseDetail().getWarehouse().getName(),
-                        detail.getQuantity()))
+                        detail.getQuantity(),
+                        detail.getItemDescription()))
                 .collect(Collectors.toList());
 
         String userFullName = adjustment.getUser().getName();
+
+        // Obtener el nombre del almacén desde el primer detalle
+        String warehouseName = adjustment.getAdjustmentDetails().isEmpty()
+                ? "N/A"
+                : adjustment.getAdjustmentDetails().get(0).getWarehouseDetail().getWarehouse().getName();
 
         return new GetAdjustmentDto(
                 adjustment.getId(),
@@ -102,46 +114,77 @@ public Page<ListAdjustmentDto> paginateAll(Pageable pageable) {
                 adjustment.getType(),
                 adjustment.getDescription(),
                 userFullName,
+                warehouseName,
                 details);
     }
 
-    //NOTA: LOS AJUSTES LLEGAN AL ALMACEN 1 SI ES QUE AHI EXISTE EL ACCESORIO A DEVOLVER
     @Override
     @Transactional
     public Adjustment createAdjustment(CreateAdjustmentDto dto) {
-        // Buscar el usuario
-        User user = userRepository.findById(dto.getUserId()).orElseThrow(() -> new RuntimeException("User not found"));
+        // 1. Obtener el almacén
+        Warehouse warehouse = warehouseRepository.findById(dto.getWarehouseId())
+                .orElseThrow(() -> new RuntimeException("Almacén no encontrado con ID: " + dto.getWarehouseId()));
 
-        // Crear el ajuste
+        // 2. Obtener el usuario
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + dto.getUserId()));
+
+        // 3. Crear el ajuste
         Adjustment adjustment = new Adjustment();
+        adjustment.setType(dto.getType().toUpperCase());
         adjustment.setDate(dto.getDate());
-        adjustment.setType(dto.getType());
         adjustment.setDescription(dto.getDescription());
         adjustment.setUser(user);
+        adjustment = adjustmentRepository.save(adjustment); // Guardar para generar ID
 
-        // Guardar el ajuste
-        adjustment = adjustmentRepository.save(adjustment);
-
-        // Crear y asociar los detalles del ajuste
+        // 4. Procesar cada detalle
         for (CreateAdjustmentDetailDto detailDto : dto.getAdjustmentDetails()) {
-            WarehouseDetail warehouseDetail = warehouseDetailRepository.findById(detailDto.getWarehouseDetailId())
-                    .orElseThrow(() -> new RuntimeException("Warehouse detail not found"));
+            // Obtener accesorio
+            Accessory accessory = accessoryRepository.findById(detailDto.getAccessoryId())
+                    .orElseThrow(() -> new RuntimeException(
+                            "Accesorio no encontrado con ID: " + detailDto.getAccessoryId()));
 
+            // Buscar o crear WarehouseDetail
+            WarehouseDetail warehouseDetail = warehouseDetailRepository
+                    .findByWarehouseIdAndAccessoryId(warehouse.getId(), accessory.getId())
+                    .orElseGet(() -> {
+                        WarehouseDetail newDetail = new WarehouseDetail();
+                        newDetail.setWarehouse(warehouse);
+                        newDetail.setAccessory(accessory);
+                        newDetail.setStock(0); // Inicializar con stock 0
+                        newDetail.setState("AVAILABLE");
+                        return newDetail;
+                    });
+
+            int quantity = detailDto.getQuantity();
+
+            // Ajustar el stock según el tipo de ajuste
+            switch (dto.getType().toUpperCase()) {
+                case "INGRESO":
+                    warehouseDetail.setStock(warehouseDetail.getStock() + quantity);
+                    break;
+                case "EGRESO":
+                    if (warehouseDetail.getStock() < quantity) {
+                        throw new IllegalArgumentException(
+                                "Stock insuficiente para egreso del accesorio: " + accessory.getName());
+                    }
+                    warehouseDetail.setStock(warehouseDetail.getStock() - quantity);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Tipo de ajuste no válido: " + dto.getType());
+            }
+
+            // Guardar el WarehouseDetail (por si fue creado o modificado)
+            warehouseDetail = warehouseDetailRepository.save(warehouseDetail);
+
+            // Crear y guardar el detalle del ajuste
             AdjustmentDetail adjustmentDetail = new AdjustmentDetail();
             adjustmentDetail.setAdjustment(adjustment);
             adjustmentDetail.setWarehouseDetail(warehouseDetail);
-            adjustmentDetail.setQuantity(detailDto.getQuantity());
+            adjustmentDetail.setQuantity(quantity);
+            adjustmentDetail.setItemDescription(detailDto.getItemDescription()); // Solo si
 
             adjustmentDetailRepository.save(adjustmentDetail);
-
-            // Actualizar el stock dependiendo del tipo de ajuste
-            if ("Return".equalsIgnoreCase(dto.getType()) || "Increase".equalsIgnoreCase(dto.getType())) {
-                warehouseDetail.setStock(warehouseDetail.getStock() + detailDto.getQuantity());
-            } else if ("Decrease".equalsIgnoreCase(dto.getType())) {
-                warehouseDetail.setStock(warehouseDetail.getStock() - detailDto.getQuantity());
-            }
-
-            warehouseDetailRepository.save(warehouseDetail); // guardar el cambio de stock
         }
 
         return adjustment;
@@ -157,7 +200,5 @@ public Page<ListAdjustmentDto> paginateAll(Pageable pageable) {
         }
         return false;
     }
-
-    
 
 }

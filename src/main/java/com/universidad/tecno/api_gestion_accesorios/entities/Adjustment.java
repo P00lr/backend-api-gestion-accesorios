@@ -24,13 +24,14 @@ public class Adjustment {
     private LocalDateTime date;
     private String type;
     private String description;
-
+    
+    @ManyToOne
+    private User user;
+    
     @JsonIgnoreProperties({"adjustment", "warehouseDetail", "handler", "hibernateLazyInitializer"})
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "adjustment")
     private List<AdjustmentDetail> adjustmentDetails;
 
-    @ManyToOne
-    private User user;
 
     public Adjustment() {
     }

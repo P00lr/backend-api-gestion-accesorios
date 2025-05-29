@@ -19,6 +19,7 @@ public class AdjustmentDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Integer quantity;
+    private String itemDescription;
 
     @ManyToOne
     @JoinColumn(name = "adjustment_id", nullable = false)
@@ -32,9 +33,11 @@ public class AdjustmentDetail {
     public AdjustmentDetail() {
     }
 
-    public AdjustmentDetail(Long id, Integer quantity, Adjustment adjustment, WarehouseDetail warehouseDetail) {
+    public AdjustmentDetail(Long id, Integer quantity, String itemDescription, Adjustment adjustment,
+            WarehouseDetail warehouseDetail) {
         this.id = id;
         this.quantity = quantity;
+        this.itemDescription = itemDescription;
         this.adjustment = adjustment;
         this.warehouseDetail = warehouseDetail;
     }
@@ -70,5 +73,14 @@ public class AdjustmentDetail {
     public void setWarehouseDetail(WarehouseDetail warehouseDetail) {
         this.warehouseDetail = warehouseDetail;
     }
-    
+
+    public String getItemDescription() {
+        return itemDescription;
+    }
+
+    public void setItemDescription(String itemDescription) {
+        this.itemDescription = itemDescription;
+    }
+
+
 }

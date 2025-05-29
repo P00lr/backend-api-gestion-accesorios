@@ -36,6 +36,9 @@ public class WarehouseDetail {
     @JoinColumn(name = "warehouse_id", nullable = false)
     private Warehouse warehouse;
 
+    @JsonIgnoreProperties({"warehouseDetail", "adjustment", "handler", "hibernateLazyInitializer"})
+    @OneToMany(mappedBy = "warehouseDetail", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AdjustmentDetail> adjustmentDetails;
     
     @JsonIgnoreProperties({"warehouseDetail", "sale", "handler", "hibernateLazyInitializer"})
     @OneToMany(mappedBy = "warehouseDetail", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -49,9 +52,6 @@ public class WarehouseDetail {
     @OneToMany(mappedBy = "warehouseDetail", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TransferDetail> transferDetails;
     
-    @JsonIgnoreProperties({"warehouseDetail", "adjustment", "handler", "hibernateLazyInitializer"})
-    @OneToMany(mappedBy = "warehouseDetail", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AdjustmentDetail> adjustmentDetails;
     
 
     public WarehouseDetail() {

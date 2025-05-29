@@ -72,7 +72,7 @@ public class SaleController {
         boolean deteledSale = saleService.deleteById(id);
 
         if (deteledSale) {
-            return ResponseEntity.ok().body("Eliminado correctamente");
+            return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();
     }
