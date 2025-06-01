@@ -27,17 +27,14 @@ import com.universidad.tecno.api_gestion_accesorios.auth.filter.JwtValidationFil
 public class SpringSecurityConfig {
     @Autowired
     private AuthenticationConfiguration authenticationConfiguration;
-
     @Bean
     AuthenticationManager authenticationManager() throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -53,14 +50,12 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/clients/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/clients").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/clients/{id}").permitAll()
-
                  // SUPPLIER
                 .requestMatchers(HttpMethod.GET, "/api/suppliers/page/{page}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/suppliers/{id}").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/suppliers/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/suppliers").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/suppliers/{id}").permitAll()
-
                 // CATEGORIES
                 .requestMatchers(HttpMethod.GET, "/api/categories/page/{page}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
@@ -68,7 +63,6 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/categories/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/categories").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/categories/{id}").permitAll()
-
                 // WAREHOUSES
                 .requestMatchers(HttpMethod.GET, "/api/warehouses/page/{page}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/warehouses").permitAll()
@@ -77,7 +71,6 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/warehouses/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/warehouses").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/warehouses/{id}").permitAll()
-
                 // ACCESORIES
                 .requestMatchers(HttpMethod.GET, "/api/accessories/page/{page}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/accessories/page/catalog/{page}").permitAll()
@@ -85,61 +78,59 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/accessories/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/accessories").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/accessories/{id}").permitAll()
-
                 // USERS
                 
                 .requestMatchers(HttpMethod.GET, "/api/users/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/users").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/users/{id}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/users/with-permissions/{id}").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/users/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users/change-password").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/users/{id}").permitAll()
-
                 // SALES
                 .requestMatchers(HttpMethod.GET, "/api/sales/page/{page}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/sales/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/sales").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/sales/{id}").permitAll()
-
                 // PURCHASES
                 .requestMatchers(HttpMethod.GET, "/api/purchases/page/{page}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/purchases/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/purchases").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/purchases/{id}").permitAll()
-
                 // ADJUSTMENTS
                 .requestMatchers(HttpMethod.GET, "/api/adjustments/page/{page}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/adjustments/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/adjustments").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/adjustments/{id}").permitAll()
-
                 // TRANSFERSS
                 .requestMatchers(HttpMethod.GET, "/api/transfers/page/{page}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/transfers/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/transfers").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/transfers/{id}").permitAll()
-
                 // PERMISSIONS
                 .requestMatchers(HttpMethod.GET, "/api/permissions/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/permissions").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/permissions/{id}").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/permissions/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/permissions").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/permissions/assign-to-role").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/permissions/assign-to-user").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/permissions/{id}").permitAll()
-
                 // ROLES
                 .requestMatchers(HttpMethod.GET, "/api/roles/page/{page}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/roles//with-permissions").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/roles/with-permissions/page/{page}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/roles/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/roles").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/roles/{id}").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/roles/{id}").permitAll()
-
 
                         .anyRequest().authenticated())
                 .addFilter(new JwtAuthenticationFilter(authenticationManager()))
                 .addFilter(new JwtValidationFilter(authenticationManager()));
         return http.build();
     }
-
     @Bean
     CorsConfigurationSource configurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -152,7 +143,6 @@ public class SpringSecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
     @Bean
     FilterRegistrationBean<CorsFilter> corsFilter() {
         FilterRegistrationBean<CorsFilter> corsBean = new FilterRegistrationBean<CorsFilter>(
@@ -161,3 +151,4 @@ public class SpringSecurityConfig {
         return corsBean;
     }
 }
+

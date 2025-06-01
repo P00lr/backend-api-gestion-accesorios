@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.universidad.tecno.api_gestion_accesorios.dto.role.RoleWithPermissionsDto;
-import com.universidad.tecno.api_gestion_accesorios.dto.user.UserWithRolesAndPermissionsDto;
 import com.universidad.tecno.api_gestion_accesorios.entities.Role;
 
 public interface RoleService {
@@ -21,6 +20,4 @@ public interface RoleService {
     boolean deleteById(Long id);
 
     List<RoleWithPermissionsDto> getRolesWithPermissions();
-
-    List<UserWithRolesAndPermissionsDto> getUsersWithRolesAndPermissions();
 }

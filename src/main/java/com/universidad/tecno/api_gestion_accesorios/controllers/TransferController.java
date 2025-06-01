@@ -61,9 +61,9 @@ public class TransferController {
     public ResponseEntity<String> deleteTransfer(@PathVariable Long id) {
         boolean deleted = transferService.deleteTransfer(id);
         if (deleted) {
-            return ResponseEntity.ok().body("Eliminado correctamente");
+            return ResponseEntity.ok().build();
         } 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se encontro la transferencia");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
     }
 }

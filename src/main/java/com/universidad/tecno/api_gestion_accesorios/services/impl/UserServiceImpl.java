@@ -1,7 +1,6 @@
 package com.universidad.tecno.api_gestion_accesorios.services.impl;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.universidad.tecno.api_gestion_accesorios.dto.role.RolePermissionsDto;
+import com.universidad.tecno.api_gestion_accesorios.dto.PermissionDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.user.UserWithRolesAndPermissionsDto;
 import com.universidad.tecno.api_gestion_accesorios.entities.RolePermission;
 import com.universidad.tecno.api_gestion_accesorios.entities.User;
@@ -44,28 +43,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findAll() {
+    public List<User> getAllUsers() {
         return (List<User>) userRepository.findAll();
     }
 
+    //lista a los users para que sea consumido por assign to user
     @Override
-    public List<UserWithRolesAndPermissionsDto> getUsersWithRolesAndPermissions() {
-        List<User> users = (List<User>) userRepository.findAll();
+    public UserWithRolesAndPermissionsDto getUserWithRolesAndPermissions(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + userId));
 
-        return users.stream().map(user -> {
-            Map<String, List<String>> rolePermissionsMap = user.getUserRolePermissions().stream()
-                    .collect(Collectors.groupingBy(
-                            urp -> urp.getRolePermission().getRole().getName(),
-                            Collectors.mapping(
-                                    urp -> urp.getRolePermission().getPermission().getName(),
-                                    Collectors.toList())));
+        // Obtener permisos únicos asignados al usuario a través de UserRolePermissions
+        List<PermissionDto> permissions = user.getUserRolePermissions().stream()
+                .map(urp -> urp.getRolePermission().getPermission())
+                .distinct() // evitar permisos repetidos
+                .map(permission -> new PermissionDto(permission.getId(), permission.getName()))
+                .collect(Collectors.toList());
 
-            List<RolePermissionsDto> roles = rolePermissionsMap.entrySet().stream()
-                    .map(entry -> new RolePermissionsDto(entry.getKey(), entry.getValue()))
-                    .collect(Collectors.toList());
-
-            return new UserWithRolesAndPermissionsDto(user.getId(), user.getUsername(), roles);
-        }).collect(Collectors.toList());
+        return new UserWithRolesAndPermissionsDto(
+                user.getId(),
+                user.getName(),
+                user.getUsername(),
+                permissions);
     }
 
     @Override
@@ -142,4 +141,5 @@ public class UserServiceImpl implements UserService {
     }
 
     
+
 }

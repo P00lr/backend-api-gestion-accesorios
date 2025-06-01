@@ -2,17 +2,21 @@ package com.universidad.tecno.api_gestion_accesorios.dto.user;
 
 import java.util.List;
 
-import com.universidad.tecno.api_gestion_accesorios.dto.role.RolePermissionsDto;
+import com.universidad.tecno.api_gestion_accesorios.dto.PermissionDto;
 
 public class UserWithRolesAndPermissionsDto {
     private Long userId;
+    private String name;
     private String userName;
-    private List<RolePermissionsDto> roles;
+    private List<PermissionDto> permissions;
 
-    public UserWithRolesAndPermissionsDto(Long userId, String userName, List<RolePermissionsDto> roles) {
+   
+
+    public UserWithRolesAndPermissionsDto(Long userId, String name, String userName, List<PermissionDto> permissions) {
         this.userId = userId;
+        this.name = name;
         this.userName = userName;
-        this.roles = roles;
+        this.permissions = permissions;
     }
 
     public Long getUserId() {
@@ -31,12 +35,20 @@ public class UserWithRolesAndPermissionsDto {
         this.userName = userName;
     }
 
-    public List<RolePermissionsDto> getRoles() {
-        return roles;
+    public String getName() {
+        return name;
     }
 
-    public void setRoles(List<RolePermissionsDto> roles) {
-        this.roles = roles;
+    public void setName(String name) {
+        this.name = name;
     }
-    
+
+    public List<PermissionDto> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<PermissionDto> permissions) {
+        this.permissions = permissions;
+    }
+
 }

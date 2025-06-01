@@ -17,5 +17,6 @@ public interface PermissionService {
     Permission save(Permission permission);
     boolean deleteById(Long id); 
 
+    public void assignPermissionsToUser(Long userId, List<Long> permissionIds);
     void assignPermissionsToRole(Long roleId, List<Long> permissionIds);
 }

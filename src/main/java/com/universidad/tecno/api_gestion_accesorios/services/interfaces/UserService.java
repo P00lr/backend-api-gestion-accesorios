@@ -11,7 +11,7 @@ import com.universidad.tecno.api_gestion_accesorios.entities.User;
 
 public interface UserService {
     Page<User> paginateAll(Pageable pageable);
-    List<User> findAll();
+    List<User> getAllUsers();
     Optional<User> findById(Long id);
     User save(User user);
     Optional<User> update(Long id, User user);
@@ -20,6 +20,6 @@ public interface UserService {
     //asignamos rolesPermisos a los users
     void assignRolePermissions(Long userId, List<Long> rolePermissionIds);
 
-    List<UserWithRolesAndPermissionsDto> getUsersWithRolesAndPermissions();
+    public UserWithRolesAndPermissionsDto getUserWithRolesAndPermissions(Long userId);
 
 }

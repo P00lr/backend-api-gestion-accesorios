@@ -8,7 +8,6 @@ public class ListAdjustmentDto {
     private String type;
     private String description;
     private Integer totalQuantity;
-    private String warehouseName;
 
     public ListAdjustmentDto() {
     }

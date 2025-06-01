@@ -1,7 +1,6 @@
 package com.universidad.tecno.api_gestion_accesorios.services.impl;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -11,9 +10,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.universidad.tecno.api_gestion_accesorios.dto.role.RolePermissionsDto;
+import com.universidad.tecno.api_gestion_accesorios.dto.PermissionDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.role.RoleWithPermissionsDto;
-import com.universidad.tecno.api_gestion_accesorios.dto.user.UserWithRolesAndPermissionsDto;
 import com.universidad.tecno.api_gestion_accesorios.entities.Role;
 import com.universidad.tecno.api_gestion_accesorios.entities.RolePermission;
 import com.universidad.tecno.api_gestion_accesorios.entities.User;
@@ -57,8 +55,10 @@ public class RoleServiceImpl implements RoleService {
         Page<Role> rolesPage = roleRepository.findAll(pageable);
 
         List<RoleWithPermissionsDto> dtos = rolesPage.getContent().stream().map(role -> {
-            List<String> permissions = role.getRolePermissions().stream()
-                    .map(rp -> rp.getPermission().getName())
+            List<PermissionDto> permissions = role.getRolePermissions().stream()
+                    .map(rp -> new PermissionDto(
+                            rp.getPermission().getId(),
+                            rp.getPermission().getName()))
                     .collect(Collectors.toList());
 
             return new RoleWithPermissionsDto(role.getId(), role.getName(), permissions);
@@ -67,37 +67,18 @@ public class RoleServiceImpl implements RoleService {
         return new PageImpl<>(dtos, pageable, rolesPage.getTotalElements());
     }
 
+    @Override
     public List<RoleWithPermissionsDto> getRolesWithPermissions() {
         List<Role> roles = (List<Role>) roleRepository.findAll();
 
         return roles.stream().map(role -> {
-            List<String> permission = role.getRolePermissions().stream()
-                    .map(rp -> rp.getPermission().getName()) // Extraemos el nombre del permiso
+            List<PermissionDto> permissions = role.getRolePermissions().stream()
+                    .map(rp -> new PermissionDto(
+                            rp.getPermission().getId(),
+                            rp.getPermission().getName()))
                     .collect(Collectors.toList());
 
-            return new RoleWithPermissionsDto(role.getId(), role.getName(), permission);
-        }).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<UserWithRolesAndPermissionsDto> getUsersWithRolesAndPermissions() {
-        List<User> users = (List<User>) userRepository.findAll();
-
-        return users.stream().map(user -> {
-            // Agrupar por role
-            Map<String, List<String>> rolePermissionsMap = user.getUserRolePermissions().stream()
-                    .collect(Collectors.groupingBy(
-                            urp -> urp.getRolePermission().getRole().getName(),
-                            Collectors.mapping(
-                                    urp -> urp.getRolePermission().getPermission().getName(),
-                                    Collectors.toList())));
-
-            // Convertir a DTOs
-            List<RolePermissionsDto> roles = rolePermissionsMap.entrySet().stream()
-                    .map(entry -> new RolePermissionsDto(entry.getKey(), entry.getValue()))
-                    .collect(Collectors.toList());
-
-            return new UserWithRolesAndPermissionsDto(user.getId(), user.getUsername(), roles);
+            return new RoleWithPermissionsDto(role.getId(), role.getName(), permissions);
         }).collect(Collectors.toList());
     }
 

@@ -42,10 +42,14 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping
+    @GetMapping()
+    public List<User> listUser() { 
+        return userService.getAllUsers();
+    }
+   /*  @GetMapping
     public List<User> getUsers() {
         return userService.findAll();
-    }
+    } */
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
@@ -54,9 +58,9 @@ public class UserController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/with-roles-and-permissions")
-    public ResponseEntity<List<UserWithRolesAndPermissionsDto>> listUsersWithRolesAndPermissions() {
-        List<UserWithRolesAndPermissionsDto> result = userService.getUsersWithRolesAndPermissions();
+    @GetMapping("/with-permissions/{id}")
+    public ResponseEntity<UserWithRolesAndPermissionsDto> getUserWithRolesAndPermissions(@PathVariable Long id) {
+        UserWithRolesAndPermissionsDto result = userService.getUserWithRolesAndPermissions(id);
         return ResponseEntity.ok(result);
     }
 
@@ -92,7 +96,7 @@ public class UserController {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    //------------CAMBIO DE CONTRASEÑA---------------------------
+    // ------------CAMBIO DE CONTRASEÑA---------------------------
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody PasswordChangeDto dto) {
         Optional<User> userOpt = userRepository.findById(dto.getUserId());
@@ -109,5 +113,5 @@ public class UserController {
         userRepository.save(user);
         return ResponseEntity.ok().build();
     }
-    
+
 }

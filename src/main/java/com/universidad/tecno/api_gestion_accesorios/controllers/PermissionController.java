@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,9 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.universidad.tecno.api_gestion_accesorios.dto.role.RolePermissionAssignmentDto;
+import com.universidad.tecno.api_gestion_accesorios.dto.user.AssignRolePermissionsToUserRequest;
 import com.universidad.tecno.api_gestion_accesorios.entities.Permission;
 import com.universidad.tecno.api_gestion_accesorios.services.interfaces.PermissionService;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/permissions")
 public class PermissionController {
@@ -30,10 +33,11 @@ public class PermissionController {
 
     @GetMapping("/page/{page}")
     public ResponseEntity<?> listPageable(@PathVariable Integer page) {
-        Pageable pageable = PageRequest.of(page, 10);
+        Pageable pageable = PageRequest.of(page, 5);
         Page<Permission> permissions = permissionService.paginateAll(pageable);
         return ResponseEntity.ok(permissions);
     }
+
     @GetMapping
     public List<Permission> getPermissions() {
         return permissionService.findAll();
@@ -58,6 +62,14 @@ public class PermissionController {
             @RequestBody RolePermissionAssignmentDto dto) {
 
         permissionService.assignPermissionsToRole(dto.getRoleId(), dto.getPermissionIds());
+        return ResponseEntity.ok().build();
+    }
+
+    // assign permission to user
+
+    @PostMapping("/assign-to-user")
+    public ResponseEntity<?> assignPermissionsToUser(@RequestBody AssignRolePermissionsToUserRequest request) {
+        permissionService.assignPermissionsToUser(request.getUserId(), request.getPermissionIds());
         return ResponseEntity.ok().build();
     }
 

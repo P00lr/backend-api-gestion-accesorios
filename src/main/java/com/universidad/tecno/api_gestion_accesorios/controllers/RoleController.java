@@ -18,10 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.universidad.tecno.api_gestion_accesorios.dto.role.RoleWithPermissionsDto;
-import com.universidad.tecno.api_gestion_accesorios.dto.user.AssignRolePermissionsToUserRequest;
 import com.universidad.tecno.api_gestion_accesorios.entities.Role;
 import com.universidad.tecno.api_gestion_accesorios.services.interfaces.RoleService;
-import com.universidad.tecno.api_gestion_accesorios.services.interfaces.UserService;
 
 @RestController
 @RequestMapping("/api/roles")
@@ -30,8 +28,6 @@ public class RoleController {
     @Autowired
     private RoleService roleService;
 
-    @Autowired
-    private UserService userService;
 
     @GetMapping("/page/{page}")
     public ResponseEntity<?> listPageable(@PathVariable Integer page) {
@@ -69,13 +65,6 @@ public class RoleController {
     public ResponseEntity<Role> createdRole(@RequestBody Role role) {
         Role createdRole = roleService.save(role);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRole);
-    }
-
-    // asigna rolePermiso a los users
-    @PostMapping("/assign-role-permissions")
-    public ResponseEntity<String> assignRolePermissionsToUser(@RequestBody AssignRolePermissionsToUserRequest request) {
-        userService.assignRolePermissions(request.getUserId(), request.getRolePermissionIds());
-        return ResponseEntity.ok("Permisos asignados correctamente");
     }
 
     @PutMapping("/{id}")
