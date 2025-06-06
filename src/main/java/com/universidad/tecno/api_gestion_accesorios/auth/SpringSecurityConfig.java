@@ -41,6 +41,7 @@ public class SpringSecurityConfig {
                 // Rutas públicas
                 .requestMatchers(HttpMethod.GET, "/api/accessories/page/catalog/{page}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/sales").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
 
 
                 //-----------------------RUTAS PROTEGIDAS------------------------------------------
@@ -49,7 +50,6 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/users/page/{page}").hasAuthority("VER_USUARIO")
                 .requestMatchers(HttpMethod.GET, "/api/users/with-permissions/{id}").hasAuthority("VER_USUARIO")
                 .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasAuthority("VER_USUARIO")
-                .requestMatchers(HttpMethod.POST, "/api/users").hasAuthority("CREAR_USUARIO")
                 .requestMatchers(HttpMethod.POST, "/api/users/change-password").hasAuthority("CAMBIAR_PASSWORD")
                 .requestMatchers(HttpMethod.PUT, "/api/users/{id}").hasAuthority("EDITAR_USUARIO")
                 .requestMatchers(HttpMethod.DELETE, "/api/users/{id}").hasAuthority("ELIMINAR_USUARIO")
@@ -57,6 +57,7 @@ public class SpringSecurityConfig {
                  //ACCESSORIES
                 .requestMatchers(HttpMethod.GET, "/api/accessories/page/{page}").hasAuthority("VER_ACCESORIO")
                 .requestMatchers(HttpMethod.GET, "/api/accessories/{id}").hasAuthority("VER_ACCESORIO")
+                .requestMatchers(HttpMethod.GET, "/api/accessories").hasAuthority("VER_ACCESORIO")
                 .requestMatchers(HttpMethod.POST, "/api/accessories").hasAuthority("CREAR_ACCESORIO")
                 .requestMatchers(HttpMethod.PUT, "/api/accessories/{id}").hasAuthority("EDITAR_ACCESORIO")
                 .requestMatchers(HttpMethod.DELETE, "/api/accessories/{id}").hasAuthority("ELIMINAR_ACCESORIO")
@@ -102,11 +103,15 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/warehouses").hasAuthority("CREAR_ALMACEN")
                 .requestMatchers(HttpMethod.DELETE, "/api/warehouses/{id}").hasAuthority("ELIMINAR_ALMACEN")
 
+                .requestMatchers(HttpMethod.GET, "/api/warehouses/report").hasAuthority("REPORTE_ALMACEN")
+
+
                 // SALES
                 .requestMatchers(HttpMethod.GET, "/api/sales/page/{page}").hasAuthority("VER_VENTA")
                 .requestMatchers(HttpMethod.GET, "/api/sales/{id}").hasAuthority("VER_VENTA")
-                //.requestMatchers(HttpMethod.POST, "/api/sales").hasAuthority("CREAR_VENTA")
                 .requestMatchers(HttpMethod.DELETE, "/api/sales/{id}").hasAuthority("ELIMINAR_VENTA")
+                .requestMatchers(HttpMethod.GET, "/api/sales/report").hasAuthority("REPORTE_VENTA")
+
 
                 // PURCHASES
                 .requestMatchers(HttpMethod.GET, "/api/purchases/page/{page}").hasAuthority("VER_COMPRA")

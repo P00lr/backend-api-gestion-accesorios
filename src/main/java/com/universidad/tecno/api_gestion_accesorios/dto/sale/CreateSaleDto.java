@@ -4,23 +4,14 @@ import java.util.List;
 
 public class CreateSaleDto {
     
-    private Long clientId;
     private Long userId;
     private List<CreateSaleDetailDto> saleDetails;
     
     public CreateSaleDto() {
     }
-    public CreateSaleDto(Long clientId, Long userId, List<CreateSaleDetailDto> saleDetails) {
-        this.clientId = clientId;
+    public CreateSaleDto(Long userId, List<CreateSaleDetailDto> saleDetails) {
         this.userId = userId;
         this.saleDetails = saleDetails;
-    }
-    
-    public Long getClientId() {
-        return clientId;
-    }
-    public void setClientId(Long clientId) {
-        this.clientId = clientId;
     }
     public Long getUserId() {
         return userId;

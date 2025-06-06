@@ -7,20 +7,19 @@ public class ListSaleDto {
     private Double totalAmount;
     private Integer totalQuantity;
     private LocalDateTime saleDate;
-    private Long clientId;
-    private Long userId;
+    private String clientName;
     
     public ListSaleDto() {
     }
-    public ListSaleDto(Long id, Double totalAmount, Integer totalQuantity, LocalDateTime saleDate, Long clientId,
-            Long userId) {
+    
+    public ListSaleDto(Long id, Double totalAmount, Integer totalQuantity, LocalDateTime saleDate, String clientName) {
         this.id = id;
         this.totalAmount = totalAmount;
         this.totalQuantity = totalQuantity;
         this.saleDate = saleDate;
-        this.clientId = clientId;
-        this.userId = userId;
+        this.clientName = clientName;
     }
+
     public Long getId() {
         return id;
     }
@@ -45,18 +44,13 @@ public class ListSaleDto {
     public void setSaleDate(LocalDateTime saleDate) {
         this.saleDate = saleDate;
     }
-    public Long getClientId() {
-        return clientId;
-    }
-    public void setClientId(Long clientId) {
-        this.clientId = clientId;
-    }
-    public Long getUserId() {
-        return userId;
-    }
-    public void setUserId(Long userId) {
-        this.userId = userId;
+
+    public String getClientName() {
+        return clientName;
     }
 
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
+    }
     
 }

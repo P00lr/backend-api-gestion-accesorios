@@ -32,9 +32,6 @@ public class Sale {
     private List<SaleDetail> saleDetails;
     
     @ManyToOne
-    private Client client;
-
-    @ManyToOne
     private User user;
     
     public Sale() {
@@ -80,14 +77,6 @@ public class Sale {
 
     public void setSaleDetails(List<SaleDetail> saleDetails) {
         this.saleDetails = saleDetails;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
     }
 
     public User getUser() {

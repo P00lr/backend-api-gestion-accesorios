@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.universidad.tecno.api_gestion_accesorios.entities.MainUser;
 import com.universidad.tecno.api_gestion_accesorios.entities.User;
 import com.universidad.tecno.api_gestion_accesorios.repositories.UserRepository;
 
@@ -36,18 +37,16 @@ public class JpaUserDetailsService implements UserDetailsService {
 
         List<GrantedAuthority> authorities = user.getUserRolePermissions()
                 .stream()
-                .map(urp -> urp.getRolePermission().getPermission().getName()) // Ej: "READ_USERS"
+                .map(urp -> urp.getRolePermission().getPermission().getName())
                 .distinct()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
-        return new org.springframework.security.core.userdetails.User(username,
+        // 👇 Aquí usas tu clase personalizada
+        return new MainUser(
+                user.getId(),
+                username,
                 user.getPassword(),
-                true,
-                true,
-                true,
-                true,
                 authorities);
     }
-
 }

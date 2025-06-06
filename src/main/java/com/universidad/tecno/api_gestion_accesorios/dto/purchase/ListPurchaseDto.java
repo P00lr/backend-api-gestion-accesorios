@@ -7,24 +7,22 @@ public class ListPurchaseDto {
     private Double totalAmount;
     private Integer totalQuantity;
     private LocalDateTime purchaseDate;
-    private Long supplierId;
-    private Long userId;
+    private String supplierName;
+    private String userName;
 
     
     public ListPurchaseDto() {
     }
 
-
     public ListPurchaseDto(Long id, Double totalAmount, Integer totalQuantity, LocalDateTime purchaseDate,
-            Long supplierId, Long userId) {
+            String supplierName, String userName) {
         this.id = id;
         this.totalAmount = totalAmount;
         this.totalQuantity = totalQuantity;
         this.purchaseDate = purchaseDate;
-        this.supplierId = supplierId;
-        this.userId = userId;
+        this.supplierName = supplierName;
+        this.userName = userName;
     }
-
 
     public Long getId() {
         return id;
@@ -65,25 +63,24 @@ public class ListPurchaseDto {
         this.purchaseDate = purchaseDate;
     }
 
+    public String getSupplierName() {
+        return supplierName;
+    }
 
-    public Long getSupplierId() {
-        return supplierId;
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
 
-    public void setSupplierId(Long supplierId) {
-        this.supplierId = supplierId;
-    }
-
-
-    public Long getUserId() {
-        return userId;
-    }
-
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+    
     
     
 }

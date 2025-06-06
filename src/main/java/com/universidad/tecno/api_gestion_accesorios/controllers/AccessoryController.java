@@ -1,5 +1,7 @@
 package com.universidad.tecno.api_gestion_accesorios.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +37,11 @@ public class AccessoryController {
         return ResponseEntity.ok(accesorios);
     }
 
+    @GetMapping
+    public List<Accessory> getAllAccessories() {
+        return accessoryService.findAll();
+    }
+
     @GetMapping("/page/{page}")
     public ResponseEntity<Page<AccessoryWithCategoryDto>> listarPaginado(@PathVariable int page) {
         Pageable pageable = PageRequest.of(page, 15);
@@ -49,14 +56,7 @@ public class AccessoryController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    /*
-     * @PostMapping
-     * public ResponseEntity<Accessory> createAccessory(@RequestBody Accessory
-     * accessory) {
-     * Accessory newAccessory = accessoryService.save(accessory);
-     * return ResponseEntity.status(HttpStatus.CREATED).body(newAccessory);
-     * }
-     */
+    
 
     @PostMapping
     public ResponseEntity<Accessory> createAccessory(@RequestBody AccessoryAssignmentCategoryDto dto) {

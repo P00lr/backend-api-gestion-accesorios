@@ -63,8 +63,8 @@ public class PurchaseImpl implements PurchaseService {
                     dto.setTotalAmount(purchase.getTotalAmount());
                     dto.setTotalQuantity(purchase.getTotalQuantity());
                     dto.setPurchaseDate(purchase.getPurchaseDate());
-                    dto.setSupplierId(purchase.getSupplier().getId());
-                    dto.setUserId(purchase.getUser().getId());
+                    dto.setSupplierName(purchase.getSupplier().getName());
+                    dto.setUserName(purchase.getUser().getUsername());
                     return dto;
                 });
     }
@@ -84,8 +84,8 @@ public class PurchaseImpl implements PurchaseService {
             dto.setTotalAmount(p.getTotalAmount());
             dto.setTotalQuantity(p.getTotalQuantity());
             dto.setPurchaseDate(p.getPurchaseDate());
-            dto.setSupplierId(p.getSupplier().getId());
-            dto.setUserId(p.getUser().getId());
+            dto.setSupplierName(p.getSupplier().getName());
+            dto.setUserName(p.getUser().getUsername());
             return dto;
         }).collect(Collectors.toList());
     }

@@ -1,13 +1,18 @@
 package com.universidad.tecno.api_gestion_accesorios.services.impl;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+import java.util.stream.Stream;
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,13 +25,11 @@ import com.universidad.tecno.api_gestion_accesorios.dto.sale.GetSaleDetailDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.sale.GetSaleDto;
 import com.universidad.tecno.api_gestion_accesorios.dto.sale.ListSaleDto;
 import com.universidad.tecno.api_gestion_accesorios.entities.Accessory;
-import com.universidad.tecno.api_gestion_accesorios.entities.Client;
 import com.universidad.tecno.api_gestion_accesorios.entities.Sale;
 import com.universidad.tecno.api_gestion_accesorios.entities.SaleDetail;
 import com.universidad.tecno.api_gestion_accesorios.entities.User;
 import com.universidad.tecno.api_gestion_accesorios.entities.WarehouseDetail;
 import com.universidad.tecno.api_gestion_accesorios.repositories.AccessoryRepository;
-import com.universidad.tecno.api_gestion_accesorios.repositories.ClientRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.SaleRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.UserRepository;
 import com.universidad.tecno.api_gestion_accesorios.repositories.WarehouseDetailRepository;
@@ -47,9 +50,6 @@ public class SaleServiceImpl implements SaleService {
     private AccessoryRepository accessoryRepository;
 
     @Autowired
-    private ClientRepository clientRepository;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Override
@@ -67,8 +67,7 @@ public class SaleServiceImpl implements SaleService {
             dto.setTotalAmount(sale.getTotalAmount());
             dto.setTotalQuantity(sale.getTotalQuantity());
             dto.setSaleDate(sale.getSaleDate());
-            dto.setClientId(sale.getClient().getId());
-            dto.setUserId(sale.getUser().getId());
+            dto.setClientName(sale.getUser().getName());
             return dto;
         });
     }
@@ -83,8 +82,7 @@ public class SaleServiceImpl implements SaleService {
             dto.setTotalAmount(sale.getTotalAmount());
             dto.setTotalQuantity(sale.getTotalQuantity());
             dto.setSaleDate(sale.getSaleDate());
-            dto.setClientId(sale.getClient().getId());
-            dto.setUserId(sale.getUser().getId());
+            dto.setClientName(sale.getUser().getName());
             return dto;
         }).toList();
     }
@@ -100,9 +98,7 @@ public class SaleServiceImpl implements SaleService {
 
         Sale sale = saleOptional.get();
 
-        // Obtener cliente y usuario
-        Client client = clientRepository.findById(sale.getClient().getId())
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+        // Obtener usuario
         User user = userRepository.findById(sale.getUser().getId())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -129,8 +125,8 @@ public class SaleServiceImpl implements SaleService {
         saleDto.setTotalAmount(sale.getTotalAmount());
         saleDto.setTotalQuantity(sale.getTotalQuantity());
         saleDto.setSaleDate(sale.getSaleDate());
-        saleDto.setClientName(client.getName());
-        saleDto.setClientEmail(client.getEmail());
+        saleDto.setClientName(user.getName());
+        saleDto.setClientEmail(user.getEmail());
         saleDto.setUserName(user.getName());
         saleDto.setSaleDetails(saleDetails);
 
@@ -144,8 +140,6 @@ public class SaleServiceImpl implements SaleService {
         int totalQuantity = 0;
 
         Sale sale = new Sale();
-        sale.setClient(clientRepository.findById(dto.getClientId())
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado")));
         sale.setUser(userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado")));
         sale.setSaleDate(LocalDateTime.now());
@@ -195,11 +189,11 @@ public class SaleServiceImpl implements SaleService {
             totalQuantity += detail.getQuantity();
         }
 
-        //solo redondeo a 2 decimales
+        // solo redondeo a 2 decimales
         BigDecimal totalRounded = BigDecimal.valueOf(totalAmount).setScale(2, RoundingMode.HALF_UP);
         sale.setTotalAmount(totalRounded.doubleValue());
 
-        //sale.setTotalAmount(totalAmount);
+        // sale.setTotalAmount(totalAmount);
         sale.setTotalQuantity(totalQuantity);
         sale.setSaleDetails(saleDetails);
         saleRepository.save(sale); // Cascade puede guardar saleDetails también
@@ -216,6 +210,88 @@ public class SaleServiceImpl implements SaleService {
             return true;
         }
         return false;
+    }
+
+    // ------------------REPORTES-------------------
+    @Override
+    public List<Sale> getSalesBetweenDates(LocalDateTime startDate, LocalDateTime endDate) {
+        return saleRepository.findBySaleDateBetween(startDate, endDate);
+    }
+
+    // generador de pdf
+    @Override
+    public byte[] generateSalesReportBetweenDates(LocalDateTime startDate, LocalDateTime endDate)
+            throws DocumentException {
+        List<Sale> sales = saleRepository.findBySaleDateBetween(startDate, endDate);
+
+        Document document = new Document();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        PdfWriter.getInstance(document, out);
+        document.open();
+
+        Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);
+        Font subTitleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+        Font normalFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
+
+        Paragraph title = new Paragraph("Reporte Detallado de Ventas", titleFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        document.add(title);
+        document.add(new Paragraph(" "));
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+        for (Sale sale : sales) {
+            Paragraph saleHeader = new Paragraph(
+                    "Venta ID: " + sale.getId() + " | Fecha: " + formatter.format(sale.getSaleDate()) +
+                            " | Usuario: " + sale.getUser().getUsername(),
+                    subTitleFont);
+            saleHeader.setSpacingBefore(10);
+            saleHeader.setSpacingAfter(5);
+            document.add(saleHeader);
+
+            PdfPTable detailTable = new PdfPTable(5);
+            detailTable.setWidthPercentage(100);
+            detailTable.setWidths(new float[] { 4, 3, 2, 2, 2 });
+
+            Stream.of("Accesorio", "Marca/Modelo", "Cantidad", "Precio Unitario", "Subtotal")
+                    .forEach(header -> {
+                        PdfPCell cell = new PdfPCell(new Phrase(header, subTitleFont));
+                        cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        detailTable.addCell(cell);
+                    });
+
+            for (SaleDetail detail : sale.getSaleDetails()) {
+                String accessoryName = detail.getWarehouseDetail().getAccessory().getName();
+                String brandModel = detail.getWarehouseDetail().getAccessory().getBrand() + " " +
+                        detail.getWarehouseDetail().getAccessory().getModel();
+                Integer quantity = detail.getQuantity();
+                Double priceUnit = detail.getAmountType();
+                Double subtotal = priceUnit * quantity;
+
+                detailTable.addCell(new PdfPCell(new Phrase(accessoryName, normalFont)));
+                detailTable.addCell(new PdfPCell(new Phrase(brandModel, normalFont)));
+                detailTable.addCell(new PdfPCell(new Phrase(quantity.toString(), normalFont)));
+                detailTable.addCell(new PdfPCell(new Phrase(String.format("%.2f Bs", priceUnit), normalFont)));
+                detailTable.addCell(new PdfPCell(new Phrase(String.format("%.2f Bs", subtotal), normalFont)));
+            }
+
+            document.add(detailTable);
+
+            Paragraph totals = new Paragraph(
+                    String.format("Cantidad Total: %d    Monto Total: %.2f Bs",
+                            sale.getTotalQuantity(), sale.getTotalAmount()),
+                    subTitleFont);
+            totals.setSpacingBefore(5);
+            totals.setAlignment(Element.ALIGN_RIGHT);
+            document.add(totals);
+
+            document.add(new Paragraph(" "));
+        }
+
+        document.close();
+        return out.toByteArray();
     }
 
 }
