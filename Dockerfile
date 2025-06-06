@@ -2,7 +2,13 @@
 FROM maven:3.9.4-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY . .
+
+# Si usas mvnw, agrega permiso de ejecución
+RUN chmod +x ./mvnw
+
 RUN ./mvnw clean package -DskipTests
+# O si no tienes mvnw, usa:
+# RUN mvn clean package -DskipTests
 
 # Etapa 2: Ejecutar la app
 FROM eclipse-temurin:17-jdk
