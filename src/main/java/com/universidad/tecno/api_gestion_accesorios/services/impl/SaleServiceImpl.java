@@ -218,7 +218,7 @@ public class SaleServiceImpl implements SaleService {
         return saleRepository.findBySaleDateBetween(startDate, endDate);
     }
 
-    // generador de pdf
+    //---------------- generador de pdf----------------------
     @Override
     public byte[] generateSalesReportBetweenDates(LocalDateTime startDate, LocalDateTime endDate)
             throws DocumentException {

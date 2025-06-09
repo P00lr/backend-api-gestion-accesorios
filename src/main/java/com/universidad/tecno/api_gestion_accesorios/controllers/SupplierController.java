@@ -1,6 +1,8 @@
 package com.universidad.tecno.api_gestion_accesorios.controllers;
 
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +33,11 @@ public class SupplierController {
         Pageable pageable = PageRequest.of(page, 10);
         Page<Supplier> suppliers = supplierService.paginateAll(pageable);
         return ResponseEntity.ok(suppliers);
+    }
+
+    @GetMapping
+    public List<Supplier> listSuppliers() {
+        return supplierService.findAll();
     }
 
     @GetMapping("/{id}")

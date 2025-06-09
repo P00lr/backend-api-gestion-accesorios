@@ -40,8 +40,10 @@ public class SpringSecurityConfig {
         return http.authorizeHttpRequests(authz -> authz
                 // Rutas públicas
                 .requestMatchers(HttpMethod.GET, "/api/accessories/page/catalog/{page}").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/sales").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/users/{id}").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/users/change-password").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/users/{id}").permitAll()
 
 
                 //-----------------------RUTAS PROTEGIDAS------------------------------------------
@@ -49,9 +51,6 @@ public class SpringSecurityConfig {
                 // USERS
                 .requestMatchers(HttpMethod.GET, "/api/users/page/{page}").hasAuthority("VER_USUARIO")
                 .requestMatchers(HttpMethod.GET, "/api/users/with-permissions/{id}").hasAuthority("VER_USUARIO")
-                .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasAuthority("VER_USUARIO")
-                .requestMatchers(HttpMethod.POST, "/api/users/change-password").hasAuthority("CAMBIAR_PASSWORD")
-                .requestMatchers(HttpMethod.PUT, "/api/users/{id}").hasAuthority("EDITAR_USUARIO")
                 .requestMatchers(HttpMethod.DELETE, "/api/users/{id}").hasAuthority("ELIMINAR_USUARIO")
                 
                  //ACCESSORIES
@@ -81,6 +80,7 @@ public class SpringSecurityConfig {
 
                  // SUPPLIER
                 .requestMatchers(HttpMethod.GET, "/api/suppliers/page/{page}").hasAuthority("VER_PROVEEDOR")
+                .requestMatchers(HttpMethod.GET, "/api/suppliers").hasAuthority("VER_PROVEEDOR")
                 .requestMatchers(HttpMethod.GET, "/api/suppliers/{id}").hasAuthority("VER_PROVEEDOR")
                 .requestMatchers(HttpMethod.POST, "/api/suppliers").hasAuthority("CREAR_PROVEEDOR")
                 .requestMatchers(HttpMethod.PUT, "/api/suppliers/{id}").hasAuthority("EDITAR_PROVEEDOR")
@@ -103,14 +103,21 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/warehouses").hasAuthority("CREAR_ALMACEN")
                 .requestMatchers(HttpMethod.DELETE, "/api/warehouses/{id}").hasAuthority("ELIMINAR_ALMACEN")
 
+                //reporte y envio de email
                 .requestMatchers(HttpMethod.GET, "/api/warehouses/report").hasAuthority("REPORTE_ALMACEN")
+                .requestMatchers(HttpMethod.POST, "/api/email/inventory").hasAuthority("REPORTE_ALMACEN")
 
 
                 // SALES
                 .requestMatchers(HttpMethod.GET, "/api/sales/page/{page}").hasAuthority("VER_VENTA")
                 .requestMatchers(HttpMethod.GET, "/api/sales/{id}").hasAuthority("VER_VENTA")
                 .requestMatchers(HttpMethod.DELETE, "/api/sales/{id}").hasAuthority("ELIMINAR_VENTA")
+
+                //--reporte de sale y envio de email
                 .requestMatchers(HttpMethod.GET, "/api/sales/report").hasAuthority("REPORTE_VENTA")
+                .requestMatchers(HttpMethod.POST, "/api/email/sale").hasAuthority("REPORTE_VENTA")
+
+
 
 
                 // PURCHASES
