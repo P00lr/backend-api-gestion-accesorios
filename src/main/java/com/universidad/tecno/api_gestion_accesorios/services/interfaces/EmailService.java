@@ -18,6 +18,8 @@ public interface EmailService {
             List<Long> accessoryIds,
             List<Long> categoryIds,
             String generadoPor,
+            String asunto,
+            String mensaje,
             WarehouseService warehouseService) throws MessagingException;     
 
 }

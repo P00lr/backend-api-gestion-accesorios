@@ -21,7 +21,6 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-
     @Override
     public void enviarCorreoConAdjunto(
             String destinatarios,
@@ -52,12 +51,12 @@ public class EmailServiceImpl implements EmailService {
             List<Long> accessoryIds,
             List<Long> categoryIds,
             String generadoPor,
+            String asunto,
+            String mensaje,
             WarehouseService warehouseService) throws MessagingException {
 
         byte[] pdf = warehouseService.generateInventoryReportPdf(warehouseIds, accessoryIds, categoryIds, generadoPor);
-        String asunto = "Reporte de Inventario Detallado";
-        String mensaje = "<p>Adjunto encontrarás el reporte de inventario solicitado.</p>";
-
+  
         for (String destinatario : destinatarios) {
             enviarCorreoConAdjunto(destinatario, asunto, mensaje, pdf, "ReporteInventario.pdf");
         }

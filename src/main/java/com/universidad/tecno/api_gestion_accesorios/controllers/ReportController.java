@@ -23,23 +23,23 @@ import jakarta.mail.MessagingException;
 @RestController
 @RequestMapping("api/email")
 public class ReportController {
-    
+
     @Autowired
     private SaleService saleService;
 
     @Autowired
     private EmailService emailService;
 
+    // ------------------reporte de ventas envios al correo--------------------
     @PostMapping("/sale")
     public String enviarReporteVentasPorCorreo(
             @RequestParam String destinatario,
+            @RequestParam String asunto,
+            @RequestParam String mensaje,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fin) {
         try {
             byte[] pdf = saleService.generateSalesReportBetweenDates(inicio, fin);
-
-            String asunto = "Reporte de ventas del " + inicio.toLocalDate() + " al " + fin.toLocalDate();
-            String mensaje = "Adjunto el reporte de ventas solicitado.";
 
             emailService.enviarCorreoConAdjunto(
                     destinatario,
@@ -58,7 +58,7 @@ public class ReportController {
         }
     }
 
-    //-----------------------Inventario-----------------
+    // -----------------------Inventario envio de reporte al correo-----------------
     @Autowired
     private WarehouseService warehouseService;
 
@@ -69,10 +69,12 @@ public class ReportController {
         public List<Long> accessoryIds;
         public List<Long> categoryIds;
         public String generadoPor;
+        public String asunto;
+        public String mensaje;
     }
 
     @PostMapping("/inventory")
-    public ResponseEntity<String> sendInventoryReport(@RequestBody InventoryReportRequest request) {
+    public ResponseEntity<?> sendInventoryReport(@RequestBody InventoryReportRequest request) {
         try {
             emailService.enviarReporteInventario(
                     request.destinatarios,
@@ -80,9 +82,10 @@ public class ReportController {
                     request.accessoryIds,
                     request.categoryIds,
                     request.generadoPor,
-                    warehouseService
-            );
-            return ResponseEntity.ok("Reporte de inventario enviado correctamente");
+                    request.asunto,
+                    request.mensaje,
+                    warehouseService);
+            return ResponseEntity.ok().build();
         } catch (MessagingException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
