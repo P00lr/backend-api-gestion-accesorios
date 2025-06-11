@@ -33,7 +33,7 @@ public class EmailServiceImpl implements EmailService {
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
 
         try {
-            helper.setFrom("8f4357002@smtp-brevo.com", "Proyecto Tecno");
+            helper.setFrom("paulrodrigoguasace@gmail.com", "Proyecto Tecno");
         } catch (java.io.UnsupportedEncodingException e) {
             throw new MessagingException("Encoding not supported for sender name", e);
         }
