@@ -32,6 +32,12 @@ public class EmailServiceImpl implements EmailService {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
 
+        try {
+            helper.setFrom("8f4357002@smtp-brevo.com", "Proyecto Tecno");
+        } catch (java.io.UnsupportedEncodingException e) {
+            throw new MessagingException("Encoding not supported for sender name", e);
+        }
+
         String[] destinatariosArray = destinatarios.split("\\s*,\\s*"); // divide por coma y elimina espacios
 
         helper.setTo(destinatariosArray);
@@ -56,7 +62,7 @@ public class EmailServiceImpl implements EmailService {
             WarehouseService warehouseService) throws MessagingException {
 
         byte[] pdf = warehouseService.generateInventoryReportPdf(warehouseIds, accessoryIds, categoryIds, generadoPor);
-  
+
         for (String destinatario : destinatarios) {
             enviarCorreoConAdjunto(destinatario, asunto, mensaje, pdf, "ReporteInventario.pdf");
         }
