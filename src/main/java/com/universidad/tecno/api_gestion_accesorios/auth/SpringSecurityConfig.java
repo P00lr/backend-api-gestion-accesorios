@@ -44,6 +44,10 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/users/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users/change-password").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/users/{id}").permitAll()
+                
+                //especificar la url
+                .requestMatchers(HttpMethod.POST, "/api/views/home").permitAll()
+
 
 
                 //-----------------------RUTAS PROTEGIDAS------------------------------------------
@@ -146,6 +150,7 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/roles").hasAuthority("CREAR_ROL")
                 .requestMatchers(HttpMethod.PUT, "/api/roles/{id}").hasAuthority("EDITAR_ROL")
                 .requestMatchers(HttpMethod.DELETE, "/api/roles/{id}").hasAuthority("ELIMINAR_ROL")
+                
 
 
 

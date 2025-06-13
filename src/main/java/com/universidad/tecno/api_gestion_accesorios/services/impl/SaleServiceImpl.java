@@ -142,6 +142,7 @@ public class SaleServiceImpl implements SaleService {
         Sale sale = new Sale();
         sale.setUser(userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado")));
+                
         sale.setSaleDate(LocalDateTime.now());
 
         List<SaleDetail> saleDetails = new ArrayList<>();
