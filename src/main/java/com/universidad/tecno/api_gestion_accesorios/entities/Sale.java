@@ -25,14 +25,15 @@ public class Sale {
     private Double totalAmount;
     private Integer totalQuantity;
     private LocalDateTime saleDate;
+   
+    @ManyToOne
+    private User user;
 
     //principal, si muestra a los accesorios
     @JsonIgnoreProperties({"sale", "warehouseDetail", "handler", "hibernateLazyInitializer"})
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "sale")
     private List<SaleDetail> saleDetails;
     
-    @ManyToOne
-    private User user;
     
     public Sale() {
         saleDate = LocalDateTime.now();

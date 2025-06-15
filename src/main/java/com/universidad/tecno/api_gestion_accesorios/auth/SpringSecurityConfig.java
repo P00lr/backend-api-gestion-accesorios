@@ -39,12 +39,18 @@ public class SpringSecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(authz -> authz
 
-                // Rutas públicas
+                // RUTAS PUBLICAS
                 .requestMatchers(HttpMethod.GET, "/api/accessories/page/catalog/{page}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/users/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users/change-password").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/users/{id}").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/sales").permitAll()
+                //dashboard
+                .requestMatchers(HttpMethod.GET, "/api/dashboard").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/dashboard/low-stock").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/dashboard/top-selling-accessories").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/dashboard/top-customers").permitAll()
                 
                 //VIEWS especificar la url
                 .requestMatchers(HttpMethod.POST, "/api/views/home").permitAll()

@@ -21,5 +21,7 @@ public interface AccessoryRepository extends CrudRepository<Accessory, Long>{
 """)
 Page<Accessory> findAllWithAvailableStock(Pageable pageable);
 
-
+//DASHBOARD
+    @Query("SELECT COUNT(a) FROM Accessory a")
+    Long getTotalAccessoriesCount();
 }

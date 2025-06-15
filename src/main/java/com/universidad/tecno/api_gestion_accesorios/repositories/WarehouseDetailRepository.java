@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import com.universidad.tecno.api_gestion_accesorios.dto.dashboard.LowStockItemDTO;
 import com.universidad.tecno.api_gestion_accesorios.entities.WarehouseDetail;
 
 public interface WarehouseDetailRepository extends CrudRepository<WarehouseDetail, Long> {
@@ -42,5 +43,20 @@ public interface WarehouseDetailRepository extends CrudRepository<WarehouseDetai
                         @Param("warehouseIds") List<Long> warehouseIds,
                         @Param("accessoryIds") List<Long> accessoryIds,
                         @Param("categoryIds") List<Long> categoryIds);
+
+        // dashboard
+        @Query("""
+                SELECT new com.universidad.tecno.api_gestion_accesorios.dto.dashboard.LowStockItemDTO(
+                        w.accessory.id,
+                        w.accessory.name,
+                        w.stock
+                )
+                FROM WarehouseDetail w
+                WHERE w.stock <= :threshold
+                ORDER BY w.stock ASC
+                """)
+                Page<LowStockItemDTO> findLowStockItems(@Param("threshold") int threshold, Pageable pageable);
+
+
 
 }
