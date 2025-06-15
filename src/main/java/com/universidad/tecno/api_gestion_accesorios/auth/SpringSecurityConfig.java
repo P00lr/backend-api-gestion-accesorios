@@ -46,11 +46,7 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/users/change-password").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/users/{id}").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/sales").permitAll()
-                //dashboard
-                .requestMatchers(HttpMethod.GET, "/api/dashboard").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/dashboard/low-stock").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/dashboard/top-selling-accessories").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/dashboard/top-customers").permitAll()
+                
                 
                 //VIEWS especificar la url
                 .requestMatchers(HttpMethod.POST, "/api/views/home").permitAll()
@@ -163,7 +159,12 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/roles").hasAuthority("CREAR_ROL")
                 .requestMatchers(HttpMethod.PUT, "/api/roles/{id}").hasAuthority("EDITAR_ROL")
                 .requestMatchers(HttpMethod.DELETE, "/api/roles/{id}").hasAuthority("ELIMINAR_ROL")
-                
+
+                //DASHBOARD
+                .requestMatchers(HttpMethod.GET, "/api/dashboard").hasAuthority("VER_DASHBOARD")
+                .requestMatchers(HttpMethod.GET, "/api/dashboard/low-stock").hasAuthority("VER_DASHBOARD")
+                .requestMatchers(HttpMethod.GET, "/api/dashboard/top-selling-accessories").hasAuthority("VER_DASHBOARD")
+                .requestMatchers(HttpMethod.GET, "/api/dashboard/top-customers").hasAuthority("VER_DASHBOARD")
 
 
 
