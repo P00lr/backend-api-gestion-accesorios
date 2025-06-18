@@ -9,4 +9,5 @@ public class LowStockItemDTO {
     private Long accessoryId;
     private String name;
     private int stock; 
+    private String warehouseName;
 }

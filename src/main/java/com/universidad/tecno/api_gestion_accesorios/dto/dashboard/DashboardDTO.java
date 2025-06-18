@@ -15,8 +15,4 @@ public class DashboardDTO {
         this.totals = totals;
         this.salesSummary = salesSummary;
     }
-
-    
-
-    
 }

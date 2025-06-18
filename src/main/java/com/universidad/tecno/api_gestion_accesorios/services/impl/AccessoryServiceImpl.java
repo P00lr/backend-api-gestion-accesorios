@@ -47,7 +47,7 @@ public class AccessoryServiceImpl implements AccessoryService {
                     dto.setDescription(accessory.getDescription());
                     dto.setPrice(accessory.getPrice());
                     dto.setStock(totalStock != null ? totalStock : 0);
-                    dto.setAvailable(true); // Ya sabemos que tiene stock
+                    dto.setAvailable(true); // Ya se que tiene stock
                     dto.setCategoryId(accessory.getCategory().getId());
                     dto.setCategoryName(accessory.getCategory().getName());
 

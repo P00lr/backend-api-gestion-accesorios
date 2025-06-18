@@ -14,8 +14,6 @@ import com.universidad.tecno.api_gestion_accesorios.entities.WarehouseDetail;
 
 public interface WarehouseDetailRepository extends CrudRepository<WarehouseDetail, Long> {
 
-        // Definir un método de consulta personalizado para encontrar un WarehouseDetail
-        // por WarehouseId y AccessoryId
         @Query("SELECT wd FROM WarehouseDetail wd WHERE wd.warehouse.id = :warehouseId AND wd.accessory.id = :accessoryId")
         Optional<WarehouseDetail> findByWarehouseIdAndAccessoryId(Long warehouseId, Long accessoryId);
 
@@ -44,12 +42,13 @@ public interface WarehouseDetailRepository extends CrudRepository<WarehouseDetai
                         @Param("accessoryIds") List<Long> accessoryIds,
                         @Param("categoryIds") List<Long> categoryIds);
 
-        // dashboard
+        // DASHBOARD
         @Query("""
                 SELECT new com.universidad.tecno.api_gestion_accesorios.dto.dashboard.LowStockItemDTO(
                         w.accessory.id,
                         w.accessory.name,
-                        w.stock
+                        w.stock,
+                        w.warehouse.name
                 )
                 FROM WarehouseDetail w
                 WHERE w.stock <= :threshold

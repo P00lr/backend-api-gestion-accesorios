@@ -23,6 +23,8 @@ import com.universidad.tecno.api_gestion_accesorios.dto.accessory.GetAccessories
 import com.universidad.tecno.api_gestion_accesorios.entities.Accessory;
 import com.universidad.tecno.api_gestion_accesorios.services.interfaces.AccessoryService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/accessories")
 public class AccessoryController {
@@ -56,18 +58,17 @@ public class AccessoryController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    
-
+    //le agregue sus validaciones
     @PostMapping
-    public ResponseEntity<Accessory> createAccessory(@RequestBody AccessoryAssignmentCategoryDto dto) {
+    public ResponseEntity<Accessory> createAccessory(@Valid @RequestBody AccessoryAssignmentCategoryDto dto) {
         Accessory accessory = accessoryService.saveDto(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(accessory);
     }
-
+    //le agregue sus validaciones
     @PutMapping("/{id}")
     public ResponseEntity<AccessoryWithCategoryDto> updateAccessory(
             @PathVariable Long id,
-            @RequestBody AccessoryAssignmentCategoryDto dto) {
+            @Valid @RequestBody AccessoryAssignmentCategoryDto dto) {
 
         return accessoryService.update(id, dto)
                 .map(ResponseEntity::ok)

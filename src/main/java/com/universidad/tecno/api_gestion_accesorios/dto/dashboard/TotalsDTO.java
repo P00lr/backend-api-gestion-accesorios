@@ -23,9 +23,4 @@ public class TotalsDTO {
         this.accessories = accessories;
         this.users = users;
     }
-
-   
-
-    
-    
 }

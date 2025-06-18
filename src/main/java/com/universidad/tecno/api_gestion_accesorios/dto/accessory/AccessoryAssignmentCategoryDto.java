@@ -1,13 +1,32 @@
 package com.universidad.tecno.api_gestion_accesorios.dto.accessory;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
+
 public class AccessoryAssignmentCategoryDto {
 
     private Long id;
+
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(max = 100, message = "El nombre no puede superar los 100 caracteres")
     private String name;
+
+    @NotNull(message = "El precio es obligatorio")
+    @PositiveOrZero(message = "El precio debe ser cero o mayor")
     private Double price;
+
+    @Size(max = 255, message = "La descripción no puede superar los 255 caracteres")
     private String description;
+
+    @Size(max = 100, message = "La marca no puede superar los 100 caracteres")
     private String brand;
+
+    @Size(max = 100, message = "El modelo no puede superar los 100 caracteres")
     private String model;
+
+    @NotNull(message = "La categoría es obligatoria")
     private Long categoryId;
     
     public AccessoryAssignmentCategoryDto() {
