@@ -39,7 +39,7 @@ public class AccessoryServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Limpiar las tablas antes de cada prueba
+        // Limpia las tablas antes de cada prueba
         accessoryRepository.deleteAll();
         categoryRepository.deleteAll();
 

@@ -255,7 +255,7 @@ public class SaleServiceImpl implements SaleService {
             detailTable.setWidthPercentage(100);
             detailTable.setWidths(new float[] { 4, 3, 2, 2, 2 });
 
-            Stream.of("Accesorio", "Marca/Modelo", "Cantidad", "Precio Unitario", "Subtotal")
+            Stream.of("Accesorio", "Marca/Modelo", "Cantidad", "Precio Unitario", "almacen", "Subtotal")
                     .forEach(header -> {
                         PdfPCell cell = new PdfPCell(new Phrase(header, subTitleFont));
                         cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
@@ -269,12 +269,14 @@ public class SaleServiceImpl implements SaleService {
                         detail.getWarehouseDetail().getAccessory().getModel();
                 Integer quantity = detail.getQuantity();
                 Double priceUnit = detail.getAmountType();
+                String warehouseName = detail.getWarehouseDetail().getWarehouse().getName();
                 Double subtotal = priceUnit * quantity;
 
                 detailTable.addCell(new PdfPCell(new Phrase(accessoryName, normalFont)));
                 detailTable.addCell(new PdfPCell(new Phrase(brandModel, normalFont)));
                 detailTable.addCell(new PdfPCell(new Phrase(quantity.toString(), normalFont)));
                 detailTable.addCell(new PdfPCell(new Phrase(String.format("%.2f Bs", priceUnit), normalFont)));
+                detailTable.addCell(new PdfPCell(new Phrase(warehouseName, normalFont)));
                 detailTable.addCell(new PdfPCell(new Phrase(String.format("%.2f Bs", subtotal), normalFont)));
             }
 

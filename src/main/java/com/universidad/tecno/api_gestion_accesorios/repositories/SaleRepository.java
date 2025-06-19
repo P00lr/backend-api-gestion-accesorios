@@ -15,6 +15,7 @@ public interface SaleRepository extends CrudRepository<Sale, Long> {
     Page<Sale> findAll(Pageable pageable);
 
     List<Sale> findBySaleDateBetween(LocalDateTime from, LocalDateTime to);
+    
 
     // DASHBOARD GLOBAL
     @Query("SELECT SUM(s.totalAmount) FROM Sale s WHERE FUNCTION('MONTH', s.saleDate) = FUNCTION('MONTH', CURRENT_DATE) AND FUNCTION('YEAR', s.saleDate) = FUNCTION('YEAR', CURRENT_DATE)")
